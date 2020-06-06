@@ -5,7 +5,7 @@
 
 use kernel32;
 //use detour::static_detour;
-use winapi::{HWND, LPCSTR, UINT, c_int};
+use winapi::{c_int, HWND, LPCSTR, UINT};
 //use lazy_static;
 
 /*type createmove_fn = fn(f32, *mut UserCmd) -> bool;
@@ -37,9 +37,7 @@ fn createmove_hook(input_sample_time: f32, cmd: *mut UserCmd) -> bool {
 }*/
 
 fn init() {
-    unsafe {
-        kernel32::AllocConsole()
-    };
+    unsafe { kernel32::AllocConsole() };
 
     println!("Initializing...");
 
@@ -66,17 +64,16 @@ fn init() {
 pub extern "system" fn DllMain(
     dll_module: winapi::HINSTANCE,
     call_reason: winapi::DWORD,
-    _reserved: winapi::LPVOID)
-    -> winapi::BOOL
-{
+    _reserved: winapi::LPVOID,
+) -> winapi::BOOL {
     use winapi::um::winnt::{DLL_PROCESS_ATTACH, DLL_PROCESS_DETACH};
 
     match call_reason {
         DLL_PROCESS_ATTACH => init(),
         DLL_PROCESS_DETACH => {
             println!("Detatch");
-        },
-        _ => ()
+        }
+        _ => (),
     }
 
     return winapi::TRUE;
