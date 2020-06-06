@@ -9,7 +9,7 @@
             "type": "cppvsdbg",
             "request": "launch",
             "program": "${workspaceFolder}/target/debug/rlinjector.exe",
-            "args": [""],
+            "args": ["${workspaceFolder}/target/debug/dllhack.dll", "-p", "Game.exe"],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}/target/debug",
             "externalConsole": false,

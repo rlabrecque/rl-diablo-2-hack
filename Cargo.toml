@@ -1,4 +1,5 @@
 [workspace]
 members = [
     "rlinjector",
+    "rld2hack",
 ]

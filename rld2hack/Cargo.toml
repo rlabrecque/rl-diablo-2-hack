@@ -1,0 +1,17 @@
+[package]
+name = "rld2hack"
+version = "0.1.0"
+authors = ["Riley Labrecque"]
+edition = "2018"
+license = "MIT OR Apache-2.0"
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+#gcc = "0.3"
+winapi = "0.3"
+detour = "0.7"
+user32-sys = "0.2"
+kernel32-sys = "0.2"
+lazy_static = "1.4"
