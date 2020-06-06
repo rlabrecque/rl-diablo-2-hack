@@ -5,14 +5,15 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Debug rl-diablo-2-hack",
+            "name": "Debug rlinjector",
             "type": "cppvsdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/target/debug/rl-diablo-2-hack.exe",
+            "program": "${workspaceFolder}/target/debug/rlinjector.exe",
             "args": [""],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}/target/debug",
             "externalConsole": false,
+            "preLaunchTask": "rust: cargo build",
             "sourceFileMap": {
                 "/rustc/5e1a799842ba6ed4a57e91f7ab9435947482f7d8": "${env:HOME}${env:USERPROFILE}\\.rustup\\toolchains\\stable-x86_64-pc-windows-msvc\\lib\\rustlib\\src\\rust"
             }
