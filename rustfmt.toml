@@ -1,0 +1,5 @@
+edition = "2018"
+max_width = 120
+newline_style = "Unix"
+#imports_layout = "HorizontalVertical"
+#normalize_comments = true
