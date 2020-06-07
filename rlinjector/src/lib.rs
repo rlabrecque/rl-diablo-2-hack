@@ -1,35 +1,42 @@
 use winapi;
 
+#[cfg(target_arch = "x86")]
 pub fn inject(dll_path: &std::path::PathBuf, process_name: &str) -> Result<(), Box<dyn std::error::Error>> {
     println!("Inject {:#?} {}", dll_path, process_name);
+    println!("Are we elevated: {}", is_process_elevated(get_current_process()));
 
     if !dll_path.exists() {
         let err_msg = format!("DLL file specified does not exist: {:#?}", dll_path);
         return Err(err_msg.into());
     }
 
-    let mut process_ids: Vec<u32> = get_process_ids_from_name(&process_name);
+    let process_ids: Vec<u32> = get_process_ids_from_name(&process_name);
     if process_ids.is_empty() {
-        let err_msg = format!("Process  '{}' does not exist.", process_name);
+        let err_msg = format!("Process '{}' does not exist.", process_name);
         return Err(err_msg.into());
     }
 
     for pid in &process_ids {
-        /*let process_handle: winapi::HANDLE = open_process(
-            *p,
-            winapi::winnt::PROCESS_CREATE_THREAD
-                | winapi::winnt::PROCESS_QUERY_INFORMATION
-                | winapi::winnt::PROCESS_VM_OPERATION
-                | winapi::winnt::PROCESS_VM_WRITE
-                | winapi::winnt::PROCESS_VM_READ,
+        println!("{}", pid);
+
+        let process_handle: winapi::um::winnt::HANDLE = open_process(
+            *pid,
+            winapi::um::winnt::PROCESS_CREATE_THREAD
+                | winapi::um::winnt::PROCESS_QUERY_INFORMATION
+                | winapi::um::winnt::PROCESS_VM_OPERATION
+                | winapi::um::winnt::PROCESS_VM_WRITE
+                | winapi::um::winnt::PROCESS_VM_READ,
         );
 
-        if process_handle == null_mut() {
-            println!("Process with id {:?} does not exist or is not accessible.", p);
+        if process_handle == std::ptr::null_mut() {
+            print_get_last_err();
+            println!("Process with id {:?} does not exist or is not accessible.", pid);
             continue;
         }
 
-        let remote_module: winapi::minwindef::HMODULE = find_remote_module_by_path(*p, dll_path_real);
+        println!("Process {} successfully opened.", pid);
+
+        /*let remote_module: winapi::minwindef::HMODULE = find_remote_module_by_path(*p, dll_path_real);
         if remote_module != null_mut() {
             println!("DLL already exists in process. HMODULE: {:?}.", remote_module);
             println!("Injection failed.");
@@ -39,14 +46,12 @@ pub fn inject(dll_path: &std::path::PathBuf, process_name: &str) -> Result<(), B
             } else {
                 println!("Injection failed.");
             }
-        }
-
-        if process_handle != null_mut() {
-            unsafe {
-                kernel32::CloseHandle(process_handle);
-            }
         }*/
-        println!("{}", pid);
+
+        println!("Closing process {}", pid);
+        if process_handle != std::ptr::null_mut() {
+            close_handle(process_handle);
+        }
     }
 
     Ok(())
@@ -95,19 +100,74 @@ fn get_process_ids_from_name(process_name: &str) -> Vec<u32> {
     }
 
     if snapshot != winapi::um::handleapi::INVALID_HANDLE_VALUE {
-        unsafe {
-            winapi::um::handleapi::CloseHandle(snapshot);
-        }
+        close_handle(snapshot);
     }
 
     return process_ids;
 }
 
-/*fn open_process(process_id: u32, desired_access: winapi::minwindef::DWORD) -> winapi::HANDLE {
-    let process_handle: winapi::HANDLE;
+fn open_process(process_id: u32, desired_access: winapi::shared::minwindef::DWORD) -> winapi::um::winnt::HANDLE {
     unsafe {
-        process_handle = kernel32::OpenProcess(desired_access, winapi::minwindef::FALSE, process_id);
+        winapi::um::processthreadsapi::OpenProcess(desired_access, winapi::shared::minwindef::FALSE, process_id)
+    }
+}
+
+fn open_process_token(process_handle: winapi::um::winnt::HANDLE, desired_access: winapi::shared::minwindef::DWORD, token_handle: winapi::um::winnt::PHANDLE) -> bool {
+    unsafe {
+        let ret = winapi::um::processthreadsapi::OpenProcessToken(process_handle, desired_access, token_handle);
+        return ret == winapi::shared::minwindef::TRUE;
+    }
+}
+
+fn get_current_process() -> winapi::um::winnt::HANDLE {
+    unsafe {
+        winapi::um::processthreadsapi::GetCurrentProcess()
+    }
+}
+
+fn close_handle(handle: winapi::um::winnt::HANDLE) -> bool {
+    assert_ne!(handle, winapi::um::handleapi::INVALID_HANDLE_VALUE);
+
+    unsafe {
+        let ret = winapi::um::handleapi::CloseHandle(handle);
+        return ret == winapi::shared::minwindef::TRUE;
+    }
+}
+
+fn get_token_information(token_handle: winapi::um::winnt::HANDLE,
+    token_information_class: winapi::um::winnt::TOKEN_INFORMATION_CLASS,
+    token_information: winapi::shared::minwindef::LPVOID,
+    token_information_length: winapi::shared::minwindef::DWORD,
+    return_length: winapi::shared::minwindef::PDWORD) -> bool {
+    unsafe {
+        let ret = winapi::um::securitybaseapi::GetTokenInformation(token_handle,token_information_class, token_information, token_information_length, return_length);
+        return ret == winapi::shared::minwindef::TRUE;
+    }
+}
+
+fn print_get_last_err() {
+    unsafe {
+        let err_code = winapi::um::errhandlingapi::GetLastError();
+        println!("GetLastError: {}", err_code);
+    }
+}
+
+fn is_process_elevated(process_handle: winapi::um::winnt::HANDLE) -> bool {
+    let mut is_elevated = false;
+    let mut token: winapi::um::winnt::HANDLE = std::ptr::null_mut();
+
+    if open_process_token(process_handle, winapi::um::winnt::TOKEN_QUERY, &mut token) {
+        let mut elevation = winapi::um::winnt::TOKEN_ELEVATION::default();
+        let size = std::mem::size_of::<winapi::um::winnt::TOKEN_ELEVATION>() as u32;
+        let mut ret_size = size;
+        if get_token_information(token, winapi::um::winnt::TokenElevation, &mut elevation as *mut _ as *mut _, size, &mut ret_size) {
+            is_elevated = elevation.TokenIsElevated != 0;
+        }
     }
 
-    return process_handle;
-}*/
+    if !token.is_null() {
+        close_handle(token);
+    }
+
+    return is_elevated;
+}
