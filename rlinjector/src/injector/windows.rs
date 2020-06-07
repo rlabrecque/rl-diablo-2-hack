@@ -1,7 +1,28 @@
-pub fn create_tool_help32_snapshot(flags: winapi::shared::minwindef::DWORD, process_id: winapi::shared::minwindef::DWORD) -> winapi::um::winnt::HANDLE {
+pub fn process32_first(
+    snapshot: winapi::um::winnt::HANDLE,
+    process_entry: winapi::um::tlhelp32::LPPROCESSENTRY32W,
+) -> bool {
     unsafe {
-        winapi::um::tlhelp32::CreateToolhelp32Snapshot(flags, process_id)
+        let ret = winapi::um::tlhelp32::Process32FirstW(snapshot, process_entry);
+        ret == winapi::shared::minwindef::TRUE
     }
+}
+
+pub fn process32_next(
+    snapshot: winapi::um::winnt::HANDLE,
+    process_entry: winapi::um::tlhelp32::LPPROCESSENTRY32W,
+) -> bool {
+    unsafe {
+        let ret = winapi::um::tlhelp32::Process32NextW(snapshot, process_entry);
+        ret == winapi::shared::minwindef::TRUE
+    }
+}
+
+pub fn create_tool_help32_snapshot(
+    flags: winapi::shared::minwindef::DWORD,
+    process_id: winapi::shared::minwindef::DWORD,
+) -> winapi::um::winnt::HANDLE {
+    unsafe { winapi::um::tlhelp32::CreateToolhelp32Snapshot(flags, process_id) }
 }
 
 pub fn get_token_information(

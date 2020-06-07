@@ -18,23 +18,21 @@ pub fn get_process_ids_from_name(process_name: &str) -> Vec<u32> {
         szExeFile: [0; winapi::shared::minwindef::MAX_PATH],
     };
 
-    let snapshot: winapi::um::winnt::HANDLE = windows::create_tool_help32_snapshot(winapi::um::tlhelp32::TH32CS_SNAPPROCESS, 0);
+    let snapshot: winapi::um::winnt::HANDLE =
+        windows::create_tool_help32_snapshot(winapi::um::tlhelp32::TH32CS_SNAPPROCESS, 0);
 
     let mut process_ids: Vec<u32> = Vec::new();
 
-    unsafe {
-        if winapi::um::tlhelp32::Process32FirstW(snapshot, &mut process_entry) == winapi::shared::minwindef::TRUE {
-            // TODO: Bug where we skip this first process??
-            while winapi::um::tlhelp32::Process32NextW(snapshot, &mut process_entry) == winapi::shared::minwindef::TRUE
-            {
-                let filename: OsString = OsString::from_wide(&process_entry.szExeFile);
-                let filename: &str = filename.to_str().unwrap();
-                let filename: WideCString = WideCString::from_str_with_nul(filename).unwrap();
-                let filename: String = filename.to_string_lossy();
-                println!("Process name: {:#?}", filename);
-                if filename == *process_name {
-                    process_ids.push(process_entry.th32ProcessID);
-                }
+    if windows::process32_first(snapshot, &mut process_entry) {
+        // TODO: Bug where we skip this first process??
+        while windows::process32_next(snapshot, &mut process_entry) {
+            let filename: OsString = OsString::from_wide(&process_entry.szExeFile);
+            let filename: &str = filename.to_str().unwrap();
+            let filename: WideCString = WideCString::from_str_with_nul(filename).unwrap();
+            let filename: String = filename.to_string_lossy();
+            println!("Process name: {:#?}", filename);
+            if filename == *process_name {
+                process_ids.push(process_entry.th32ProcessID);
             }
         }
     }
@@ -101,12 +99,12 @@ pub fn is_process_elevated(process_handle: winapi::um::winnt::HANDLE) -> bool {
                         break;
                     }
                 }
-	       }
+           }
     }
 
-	if snapshot != winapi::INVALID_HANDLE_VALUE {
-		unsafe { kernel32::CloseHandle( snapshot ); }
+    if snapshot != winapi::INVALID_HANDLE_VALUE {
+        unsafe { kernel32::CloseHandle( snapshot ); }
     }
 
-	return module_handle;
+    return module_handle;
 }*/
