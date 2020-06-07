@@ -3,7 +3,6 @@
 */
 #![cfg(all(windows, feature = "nightly"))]
 
-use kernel32;
 //use detour::static_detour;
 use winapi::{c_int, HWND, LPCSTR, UINT};
 //use lazy_static;

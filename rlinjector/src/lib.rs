@@ -80,7 +80,8 @@ fn get_process_ids_from_name(process_name: &str) -> Vec<u32> {
     unsafe {
         if winapi::um::tlhelp32::Process32FirstW(snapshot, &mut process_entry) == winapi::shared::minwindef::TRUE {
             // TODO: Bug where we skip this first process??
-            while winapi::um::tlhelp32::Process32NextW(snapshot, &mut process_entry) == winapi::shared::minwindef::TRUE {
+            while winapi::um::tlhelp32::Process32NextW(snapshot, &mut process_entry) == winapi::shared::minwindef::TRUE
+            {
                 let filename: OsString = OsString::from_wide(&process_entry.szExeFile);
                 let filename: &str = filename.to_str().unwrap();
                 let filename: WideCString = WideCString::from_str_with_nul(filename).unwrap();
