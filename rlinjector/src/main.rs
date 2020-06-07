@@ -1,4 +1,4 @@
-mod lib;
+mod injector;
 mod options;
 
 use options::Options;
@@ -6,5 +6,5 @@ use options::Options;
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let opt = Options::default();
 
-    lib::inject(&opt.dll_path, &opt.process_name)
+    injector::inject(&opt.dll_path, &opt.process_name)
 }
