@@ -20,11 +20,11 @@ pub fn inject(dll_path: &std::path::PathBuf, process_name: &str) -> Result<(), B
         return Err(err_msg.into());
     }
 
-    for pid in &process_ids {
-        println!("{}", pid);
+    for process_id in &process_ids {
+        println!("{}", process_id);
 
         let process_handle: winapi::um::winnt::HANDLE = windows::open_process(
-            *pid,
+            *process_id,
             winapi::um::winnt::PROCESS_CREATE_THREAD
                 | winapi::um::winnt::PROCESS_QUERY_INFORMATION
                 | winapi::um::winnt::PROCESS_VM_OPERATION
@@ -34,25 +34,26 @@ pub fn inject(dll_path: &std::path::PathBuf, process_name: &str) -> Result<(), B
 
         if process_handle == std::ptr::null_mut() {
             windows::print_get_last_err();
-            println!("Process with id {:?} does not exist or is not accessible.", pid);
+            println!("Process with id {:?} does not exist or is not accessible.", process_id);
             continue;
         }
 
-        println!("Process {} successfully opened.", pid);
+        println!("Process {} successfully opened.", process_id);
 
-        /*let remote_module: winapi::minwindef::HMODULE = find_remote_module_by_path(*p, dll_path_real);
-        if remote_module != null_mut() {
+        let remote_module: winapi::shared::minwindef::HMODULE =
+            winutils::find_remote_module_by_path(*process_id, dll_path);
+        if remote_module != std::ptr::null_mut() {
             println!("DLL already exists in process. HMODULE: {:?}.", remote_module);
             println!("Injection failed.");
         } else {
-            if inject_library(process_handle, &dll_path_real) {
+            /*if inject_library(process_handle, &dll_path_real) {
                 println!("Successfully injected {:?} into {:?}.", dll_path, p);
             } else {
                 println!("Injection failed.");
-            }
-        }*/
+            }*/
+        }
 
-        println!("Closing process {}", pid);
+        println!("Closing process {}", process_id);
         if process_handle != std::ptr::null_mut() {
             windows::close_handle(process_handle);
         }

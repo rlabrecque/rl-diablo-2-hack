@@ -1,3 +1,22 @@
+pub fn module32_first(
+    snapshot: winapi::um::winnt::HANDLE,
+    module_entry: winapi::um::tlhelp32::LPMODULEENTRY32W,
+) -> bool {
+    unsafe {
+        let ret = winapi::um::tlhelp32::Module32FirstW(snapshot, module_entry);
+        ret == winapi::shared::minwindef::TRUE
+    }
+}
+
+pub fn module32_next(
+    snapshot: winapi::um::winnt::HANDLE,
+    module_entry: winapi::um::tlhelp32::LPMODULEENTRY32W,
+) -> bool {
+    unsafe {
+        let ret = winapi::um::tlhelp32::Module32NextW(snapshot, module_entry);
+        ret == winapi::shared::minwindef::TRUE
+    }
+}
 pub fn process32_first(
     snapshot: winapi::um::winnt::HANDLE,
     process_entry: winapi::um::tlhelp32::LPPROCESSENTRY32W,

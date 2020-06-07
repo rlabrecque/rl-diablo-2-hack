@@ -30,6 +30,7 @@ pub fn get_process_ids_from_name(process_name: &str) -> Vec<u32> {
             let filename: &str = filename.to_str().unwrap();
             let filename: WideCString = WideCString::from_str_with_nul(filename).unwrap();
             let filename: String = filename.to_string_lossy();
+
             println!("Process name: {:#?}", filename);
             if filename == *process_name {
                 process_ids.push(process_entry.th32ProcessID);
@@ -70,41 +71,48 @@ pub fn is_process_elevated(process_handle: winapi::um::winnt::HANDLE) -> bool {
     return is_elevated;
 }
 
-/*pub fn find_remote_module_by_path(process_id: u32, dll_path: &Path) -> winapi::minwindef::HMODULE {
-    let snapshot: winapi::HANDLE;
-    let mut module_entry = winapi::tlhelp32::MODULEENTRY32W {
-        dwSize: mem::size_of::<winapi::tlhelp32::MODULEENTRY32W>() as u32,
+pub fn find_remote_module_by_path(process_id: u32, dll_path: &std::path::Path) -> winapi::shared::minwindef::HMODULE {
+    use std::ffi::OsString;
+    use std::os::windows::ffi::OsStringExt;
+    use widestring::WideCString;
+
+    let snapshot: winapi::um::winnt::HANDLE;
+    let mut module_entry = winapi::um::tlhelp32::MODULEENTRY32W {
+        dwSize: std::mem::size_of::<winapi::um::tlhelp32::MODULEENTRY32W>() as u32,
         th32ModuleID: 0,
         th32ProcessID: 0,
         GlblcntUsage: 0,
         ProccntUsage: 0,
-        modBaseAddr: null_mut(),
+        modBaseAddr: std::ptr::null_mut(),
         modBaseSize: 0,
-        hModule: null_mut(),
-        szModule: [0; winapi::tlhelp32::MAX_MODULE_NAME32 + 1],
-        szExePath: [0; winapi::minwindef::MAX_PATH]
+        hModule: std::ptr::null_mut(),
+        szModule: [0; winapi::um::tlhelp32::MAX_MODULE_NAME32 + 1],
+        szExePath: [0; winapi::shared::minwindef::MAX_PATH],
     };
 
-    unsafe { snapshot = kernel32::CreateToolhelp32Snapshot(winapi::tlhelp32::TH32CS_SNAPMODULE, process_id); }
+    let snapshot: winapi::um::winnt::HANDLE =
+        windows::create_tool_help32_snapshot(winapi::um::tlhelp32::TH32CS_SNAPMODULE, process_id);
 
-    let mut module_handle: winapi::minwindef::HMODULE = null_mut();
-    unsafe {
-             if kernel32::Module32FirstW(snapshot, &mut module_entry) == winapi::minwindef::TRUE {
+    let mut module_handle: winapi::shared::minwindef::HMODULE = std::ptr::null_mut();
+    if windows::module32_first(snapshot, &mut module_entry) {
+        while windows::module32_next(snapshot, &mut module_entry) {
+            let filename: OsString = OsString::from_wide(&module_entry.szExePath);
+            let filename: &str = filename.to_str().unwrap();
+            let filename: WideCString = WideCString::from_str_with_nul(filename).unwrap();
+            let filename: String = filename.to_string_lossy();
+            let filename: std::path::PathBuf = std::path::PathBuf::from(filename);
 
-                while kernel32::Module32NextW(snapshot, &mut module_entry) == winapi::minwindef::TRUE {
-                    let wide_str:OsString = OsStringExt::from_wide(&module_entry.szExePath);
-                    let exe_str:WideCString = WideCString::from_str_with_nul(wide_str).unwrap();
-                    if exe_str.to_os_string() == dll_path.as_os_str() {
-                        module_handle = module_entry.hModule;
-                        break;
-                    }
-                }
-           }
+            println!("Module name: {:#?}", filename);
+            if filename == *dll_path {
+                module_handle = module_entry.hModule;
+                break;
+            }
+        }
     }
 
-    if snapshot != winapi::INVALID_HANDLE_VALUE {
-        unsafe { kernel32::CloseHandle( snapshot ); }
+    if snapshot != winapi::um::handleapi::INVALID_HANDLE_VALUE {
+        windows::close_handle(snapshot);
     }
 
     return module_handle;
-}*/
+}
