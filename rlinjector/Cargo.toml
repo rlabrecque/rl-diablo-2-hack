@@ -1,9 +1,11 @@
 [package]
 name = "rlinjector"
 version = "0.1.0"
-authors = ["Riley Labrecque"]
+authors = [ "Riley Labrecque" ]
 edition = "2018"
 license = "MIT OR Apache-2.0"
 
 [dependencies]
 structopt = "0.3"
+winapi = { version = "0.3", features = [ "tlhelp32", "handleapi" ] }
+widestring = "0.4"
