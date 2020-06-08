@@ -1,7 +1,8 @@
-/*
-    Rust code explaining how direct function detours work
-*/
-#![cfg(all(windows, feature = "nightly"))]
+#[cfg(not(target_os = "windows"))]
+compile_error!("this only works for windows");
+
+#[cfg(not(target_arch = "x86"))]
+compile_error!("this only works for 32bit");
 
 //use detour::static_detour;
 //use lazy_static;
@@ -37,7 +38,7 @@ fn createmove_hook(input_sample_time: f32, cmd: *mut UserCmd) -> bool {
 fn init() {
     //unsafe { winapi::um::consoleapi::AllocConsole() };
 
-    let load_library_cstring = CString::new("InitializingDebugString").unwrap();
+    let load_library_cstring = std::ffi::CString::new("InitializingDebugString").unwrap();
     unsafe {
         winapi::um::debugapi::OutputDebugStringA(load_library_cstring.as_ptr());
     }
@@ -63,20 +64,32 @@ fn init() {
 }
 
 #[no_mangle]
-#[allow(non_snake_case, unused_variables)]
+#[allow(non_snake_case)]
 pub extern "system" fn DllMain(
-    dll_module: winapi::shared::minwindef::HINSTANCE,
+    _dll_module: winapi::shared::minwindef::HINSTANCE,
     call_reason: winapi::shared::minwindef::DWORD,
     _reserved: winapi::shared::minwindef::LPVOID,
 ) -> winapi::shared::minwindef::BOOL {
     use winapi::um::winnt::{DLL_PROCESS_ATTACH, DLL_PROCESS_DETACH};
 
+    println!("TEST2");
+    let load_library_cstring = std::ffi::CString::new("ScoopWoop").unwrap();
+    unsafe {
+        winapi::um::debugapi::OutputDebugStringA(load_library_cstring.as_ptr());
+    }
+
     match call_reason {
         DLL_PROCESS_ATTACH => init(),
         DLL_PROCESS_DETACH => {
-            println!("Detatch");
+            println!("Detatch2");
+            let load_library_cstring = std::ffi::CString::new("Detach").unwrap();
+            unsafe {
+                winapi::um::debugapi::OutputDebugStringA(load_library_cstring.as_ptr());
+            }
+
         }
-        _ => (),
+        _ => {
+        },
     }
 
     return winapi::shared::minwindef::TRUE;
