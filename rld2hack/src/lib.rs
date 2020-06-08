@@ -1,8 +1,8 @@
 #[cfg(not(target_os = "windows"))]
-compile_error!("this only works for windows");
+compile_error!("This only works on Windows.");
 
 #[cfg(not(target_arch = "x86"))]
-compile_error!("this only works for 32bit");
+compile_error!("This only works on 32bit.");
 
 //use detour::static_detour;
 //use lazy_static;
@@ -63,31 +63,101 @@ fn init() {
     hook.call(100.0, std::ptr::null_mut());*/
 }
 
-#[no_mangle]
-#[allow(non_snake_case)]
-pub extern "system" fn DllMain(
-    _dll_module: winapi::shared::minwindef::HINSTANCE,
-    call_reason: winapi::shared::minwindef::DWORD,
-    _reserved: winapi::shared::minwindef::LPVOID,
-) -> winapi::shared::minwindef::BOOL {
-    use winapi::um::winnt::{DLL_PROCESS_ATTACH, DLL_PROCESS_DETACH};
-
-    let load_library_cstring = std::ffi::CString::new(format!("DllMain: {}", call_reason)).unwrap();
+fn print_dbg(msg: &str) {
+    let load_library_cstring = std::ffi::CString::new(msg).unwrap();
     unsafe {
         winapi::um::debugapi::OutputDebugStringA(load_library_cstring.as_ptr());
     }
+    println!("{}", msg);
+}
 
-    match call_reason {
-        DLL_PROCESS_ATTACH => init(),
-        DLL_PROCESS_DETACH => {
-            let load_library_cstring = std::ffi::CString::new("Detach").unwrap();
-            unsafe {
-                winapi::um::debugapi::OutputDebugStringA(load_library_cstring.as_ptr());
-            }
+fn dll_attach(_base: winapi::shared::minwindef::LPVOID) {
+    print_dbg("Attach!");
+}
+
+fn dll_detach() {
+    print_dbg("Detatch!");
+}
+
+unsafe extern "system" fn dll_attach_wrapper(
+    base: winapi::shared::minwindef::LPVOID,
+) -> winapi::shared::minwindef::DWORD {
+    use std::panic;
+
+    match panic::catch_unwind(|| dll_attach(base)) {
+        Err(e) => {
+            print_dbg(&format!("`dll_attach` has panicked: {:#?}", e));
         }
-        _ => {
+        Ok(_) => {}
+    }
+
+    std::thread::sleep(std::time::Duration::from_secs(5));
+
+    winapi::um::libloaderapi::FreeLibraryAndExitThread(base as _, 1);
+
+    // This won't be executed because the
+    unreachable!()
+}
+
+#[no_mangle]
+#[allow(non_snake_case)]
+pub extern "system" fn DllMain(
+    hinst_dll: winapi::shared::minwindef::HINSTANCE,
+    fdw_reason: winapi::shared::minwindef::DWORD,
+    lpv_reserved: winapi::shared::minwindef::LPVOID,
+) -> winapi::shared::minwindef::BOOL {
+    print_dbg(&format!("DllMain: {}", fdw_reason));
+
+    match fdw_reason {
+        winapi::um::winnt::DLL_PROCESS_ATTACH => {
+            let mut thread_id: winapi::shared::minwindef::DWORD = 0;
+            let thread_id_ptr: *mut winapi::shared::minwindef::DWORD =
+                &mut thread_id as *mut _ as *mut winapi::shared::minwindef::DWORD;
+
+            create_thread(
+                std::ptr::null_mut(),
+                0,
+                Some(dll_attach_wrapper),
+                hinst_dll as _,
+                0,
+                thread_id_ptr,
+            );
+        }
+        winapi::um::winnt::DLL_PROCESS_DETACH => match std::panic::catch_unwind(|| dll_detach()) {
+            Err(e) => {
+                print_dbg(&format!("`dll_detach` has panicked: {:#?}", e));
+            }
+            Ok(_) => {}
         },
+        _ => {}
     }
 
     return winapi::shared::minwindef::TRUE;
+}
+
+fn disable_thread_library_calls(lib_module: winapi::shared::minwindef::HMODULE) -> bool {
+    unsafe {
+        let ret = winapi::um::libloaderapi::DisableThreadLibraryCalls(lib_module);
+        ret == winapi::shared::minwindef::TRUE
+    }
+}
+
+fn create_thread(
+    thread_attributes: winapi::um::minwinbase::LPSECURITY_ATTRIBUTES,
+    stack_size: winapi::shared::basetsd::SIZE_T,
+    start_address: winapi::um::minwinbase::LPTHREAD_START_ROUTINE,
+    parameter: winapi::shared::minwindef::LPVOID,
+    creation_flags: winapi::shared::minwindef::DWORD,
+    thread_id: winapi::shared::minwindef::LPDWORD,
+) -> winapi::um::winnt::HANDLE {
+    unsafe {
+        winapi::um::processthreadsapi::CreateThread(
+            thread_attributes,
+            stack_size,
+            start_address,
+            parameter,
+            creation_flags,
+            thread_id,
+        )
+    }
 }
