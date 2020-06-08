@@ -76,7 +76,6 @@ pub fn find_remote_module_by_path(process_id: u32, dll_path: &std::path::Path) -
     use std::os::windows::ffi::OsStringExt;
     use widestring::WideCString;
 
-    let snapshot: winapi::um::winnt::HANDLE;
     let mut module_entry = winapi::um::tlhelp32::MODULEENTRY32W {
         dwSize: std::mem::size_of::<winapi::um::tlhelp32::MODULEENTRY32W>() as u32,
         th32ModuleID: 0,
@@ -132,12 +131,12 @@ pub fn inject_library(process_handle: winapi::um::winnt::HANDLE, dll_path: &std:
     let kernel32_wide_str = WideCString::from_str(kernel32_str).unwrap();
     let kernel32_module = windows::get_module_handle(kernel32_wide_str.as_ptr());
     if kernel32_module == std::ptr::null_mut() {
-        println!("Failed to find {:}.", kernel32_str);
+        println!("Failed to find {}.", kernel32_str);
         return false;
     }
 
     let load_library_str = "LoadLibraryW";
-    let load_library_cstring = CString::new("LoadLibraryW").unwrap();
+    let load_library_cstring = CString::new(load_library_str).unwrap();
     let load_library_address = windows::get_proc_address(kernel32_module, load_library_cstring.as_ptr());
     if load_library_address == std::ptr::null_mut() {
         println!("Failed to find {}.", load_library_str);
@@ -179,9 +178,7 @@ pub fn inject_library(process_handle: winapi::um::winnt::HANDLE, dll_path: &std:
         return false;
     }
 
-    let start_routine = if load_library_address.is_null() {
-        None
-    } else {
+    let start_routine =
         unsafe {
             Some(::std::mem::transmute::<
                 winapi::shared::minwindef::FARPROC,
@@ -189,8 +186,7 @@ pub fn inject_library(process_handle: winapi::um::winnt::HANDLE, dll_path: &std:
                     lpThreadParameter: winapi::shared::minwindef::LPVOID,
                 ) -> winapi::shared::minwindef::DWORD,
             >(load_library_address))
-        }
-    };
+        };
 
     let mut thread_id: winapi::shared::minwindef::DWORD = 0;
     let thread_id_ptr: *mut winapi::shared::minwindef::DWORD =
@@ -216,14 +212,72 @@ pub fn inject_library(process_handle: winapi::um::winnt::HANDLE, dll_path: &std:
         return false;
     }
 
+    println!("Thread id: {}", thread_id);
+
     windows::wait_for_single_object(thread_handle, winapi::um::winbase::INFINITE);
+
+    windows::virtual_free_ex(process_handle, remote_string, 0, winapi::um::winnt::MEM_RELEASE);
+
+    // TODO: FreeLibrary
+
+    let module = find_module(process_handle, dll_path);
+    if module.is_null() {
+        println!("Dll did not successfully inject!");
+    }
+
     windows::close_handle(thread_handle);
-    windows::virtual_free_ex(
+    windows::close_handle(process_handle);
+    /*windows::virtual_free_ex(
         process_handle,
         remote_string,
         dll_path_size,
         winapi::um::winnt::MEM_RELEASE,
-    );
+    );*/
+
+
 
     return true;
+}
+
+
+fn find_module(process_handle: winapi::um::winnt::HANDLE, dll_path: &std::path::Path) -> winapi::shared::minwindef::HMODULE {
+    let sizeof_hmodule = std::mem::size_of::<winapi::shared::minwindef::HMODULE>();
+
+    let mut modules = {
+        let mut bytes_needed: winapi::shared::minwindef::DWORD = 0;
+        windows::enum_process_modules(process_handle, std::ptr::null_mut(), 0, &mut bytes_needed);
+        let num_entries_needed = bytes_needed as usize / sizeof_hmodule;
+        let mut modules = Vec::<winapi::shared::minwindef::HMODULE>::with_capacity(num_entries_needed);
+        modules.resize(num_entries_needed, std::ptr::null_mut());
+        modules
+    };
+
+    {
+        let mut bytes_fetched: winapi::shared::minwindef::DWORD = 0;
+        let ret = windows::enum_process_modules(process_handle, modules.as_mut_ptr(), (modules.len() * sizeof_hmodule) as u32, &mut bytes_fetched);
+        assert!(ret, "EnumProcessModules");
+
+        let num_entries_fetched = bytes_fetched as usize / sizeof_hmodule;
+        modules.resize(num_entries_fetched, std::ptr::null_mut());
+    }
+
+    let name = dll_path.file_name().unwrap().to_string_lossy().to_lowercase();
+
+    for module in modules {
+        const BUF_SIZE: usize = 1024;
+        let mut buf = [0u16; BUF_SIZE];
+
+        let n = windows::get_module_base_name(process_handle, module, buf.as_mut_ptr(), BUF_SIZE as u32);
+
+        let mut module_name = String::from_utf16_lossy(&buf);
+        module_name.truncate(n as usize);
+
+        println!("Module Name: {}", module_name);
+
+        if module_name.to_lowercase() == name {
+            return module;
+        }
+    }
+
+	return std::ptr::null_mut();
 }
