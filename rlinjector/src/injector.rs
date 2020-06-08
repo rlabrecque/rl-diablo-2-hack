@@ -46,11 +46,11 @@ pub fn inject(dll_path: &std::path::PathBuf, process_name: &str) -> Result<(), B
             println!("DLL already exists in process. HMODULE: {:?}.", remote_module);
             println!("Injection failed.");
         } else {
-            /*if inject_library(process_handle, &dll_path_real) {
-                println!("Successfully injected {:?} into {:?}.", dll_path, p);
+            if winutils::inject_library(process_handle, &dll_path) {
+                println!("Successfully injected {:?} into {:?}.", dll_path, process_id);
             } else {
                 println!("Injection failed.");
-            }*/
+            }
         }
 
         println!("Closing process {}", process_id);

@@ -1,3 +1,84 @@
+pub fn wait_for_single_object(
+    handle: winapi::um::winnt::HANDLE,
+    milliseconds: winapi::shared::minwindef::DWORD,
+) -> winapi::shared::minwindef::DWORD {
+    unsafe { winapi::um::synchapi::WaitForSingleObject(handle, milliseconds) }
+}
+
+pub fn create_remote_thread(
+    process_handle: winapi::um::winnt::HANDLE,
+    thread_attributes: winapi::um::minwinbase::LPSECURITY_ATTRIBUTES,
+    stack_size: winapi::shared::basetsd::SIZE_T,
+    start_address: winapi::um::minwinbase::LPTHREAD_START_ROUTINE,
+    parameter: winapi::shared::minwindef::LPVOID,
+    creation_flags: winapi::shared::minwindef::DWORD,
+    thread_id: winapi::shared::minwindef::LPDWORD,
+) -> winapi::um::winnt::HANDLE {
+    unsafe {
+        winapi::um::processthreadsapi::CreateRemoteThread(
+            process_handle,
+            thread_attributes,
+            stack_size,
+            start_address,
+            parameter,
+            creation_flags,
+            thread_id,
+        )
+    }
+}
+
+pub fn write_process_memory(
+    process_handle: winapi::um::winnt::HANDLE,
+    base_address: winapi::shared::minwindef::LPVOID,
+    buffer: winapi::shared::minwindef::LPCVOID,
+    size: winapi::shared::basetsd::SIZE_T,
+    number_of_bytes_written: *mut winapi::shared::basetsd::SIZE_T,
+) -> bool {
+    unsafe {
+        let ret = winapi::um::memoryapi::WriteProcessMemory(
+            process_handle,
+            base_address,
+            buffer,
+            size,
+            number_of_bytes_written,
+        );
+        ret == winapi::shared::minwindef::TRUE
+    }
+}
+
+pub fn virtual_alloc_ex(
+    process_handle: winapi::um::winnt::HANDLE,
+    address: winapi::shared::minwindef::LPVOID,
+    size: winapi::shared::basetsd::SIZE_T,
+    allocation_type: winapi::shared::minwindef::DWORD,
+    protect_flags: winapi::shared::minwindef::DWORD,
+) -> winapi::shared::minwindef::LPVOID {
+    unsafe { winapi::um::memoryapi::VirtualAllocEx(process_handle, address, size, allocation_type, protect_flags) }
+}
+
+pub fn virtual_free_ex(
+    process_handle: winapi::um::winnt::HANDLE,
+    address: winapi::shared::minwindef::LPVOID,
+    size: winapi::shared::basetsd::SIZE_T,
+    free_type: winapi::shared::minwindef::DWORD,
+) -> bool {
+    unsafe {
+        let ret = winapi::um::memoryapi::VirtualFreeEx(process_handle, address, size, free_type);
+        ret == winapi::shared::minwindef::TRUE
+    }
+}
+
+pub fn get_proc_address(
+    module: winapi::shared::minwindef::HMODULE,
+    proc_name: winapi::shared::ntdef::LPCSTR,
+) -> winapi::shared::minwindef::FARPROC {
+    unsafe { winapi::um::libloaderapi::GetProcAddress(module, proc_name) }
+}
+
+pub fn get_module_handle(module_name: winapi::shared::ntdef::LPCWSTR) -> winapi::shared::minwindef::HMODULE {
+    unsafe { winapi::um::libloaderapi::GetModuleHandleW(module_name) }
+}
+
 pub fn module32_first(
     snapshot: winapi::um::winnt::HANDLE,
     module_entry: winapi::um::tlhelp32::LPMODULEENTRY32W,
