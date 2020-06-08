@@ -15,7 +15,7 @@
             "cwd": "${workspaceFolder}/target/debug",
             "preLaunchTask": "rust: cargo build",
             "sourceFileMap": {
-                "/rustc/5e1a799842ba6ed4a57e91f7ab9435947482f7d8": "${env:HOME}${env:USERPROFILE}\\.rustup\\toolchains\\stable-x86_64-pc-windows-msvc\\lib\\rustlib\\src\\rust"
+                "/rustc/118b50524b79e565f017e08bce9b90a16c63634f": "${env:HOME}${env:USERPROFILE}\\.rustup\\toolchains\\stable-x86_64-pc-windows-msvc\\lib\\rustlib\\src\\rust"
             }
         }
     ]
