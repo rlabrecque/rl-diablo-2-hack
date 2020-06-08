@@ -72,8 +72,7 @@ pub extern "system" fn DllMain(
 ) -> winapi::shared::minwindef::BOOL {
     use winapi::um::winnt::{DLL_PROCESS_ATTACH, DLL_PROCESS_DETACH};
 
-    println!("TEST2");
-    let load_library_cstring = std::ffi::CString::new("ScoopWoop").unwrap();
+    let load_library_cstring = std::ffi::CString::new(format!("DllMain: {}", call_reason)).unwrap();
     unsafe {
         winapi::um::debugapi::OutputDebugStringA(load_library_cstring.as_ptr());
     }
@@ -81,12 +80,10 @@ pub extern "system" fn DllMain(
     match call_reason {
         DLL_PROCESS_ATTACH => init(),
         DLL_PROCESS_DETACH => {
-            println!("Detatch2");
             let load_library_cstring = std::ffi::CString::new("Detach").unwrap();
             unsafe {
                 winapi::um::debugapi::OutputDebugStringA(load_library_cstring.as_ptr());
             }
-
         }
         _ => {
         },
