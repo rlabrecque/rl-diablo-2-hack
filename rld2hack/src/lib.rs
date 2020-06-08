@@ -4,7 +4,6 @@
 #![cfg(all(windows, feature = "nightly"))]
 
 //use detour::static_detour;
-use winapi::{c_int, HWND, LPCSTR, UINT};
 //use lazy_static;
 
 /*type createmove_fn = fn(f32, *mut UserCmd) -> bool;
@@ -36,7 +35,12 @@ fn createmove_hook(input_sample_time: f32, cmd: *mut UserCmd) -> bool {
 }*/
 
 fn init() {
-    unsafe { kernel32::AllocConsole() };
+    //unsafe { winapi::um::consoleapi::AllocConsole() };
+
+    let load_library_cstring = CString::new("InitializingDebugString").unwrap();
+    unsafe {
+        winapi::um::debugapi::OutputDebugStringA(load_library_cstring.as_ptr());
+    }
 
     println!("Initializing...");
 
@@ -61,10 +65,10 @@ fn init() {
 #[no_mangle]
 #[allow(non_snake_case, unused_variables)]
 pub extern "system" fn DllMain(
-    dll_module: winapi::HINSTANCE,
-    call_reason: winapi::DWORD,
-    _reserved: winapi::LPVOID,
-) -> winapi::BOOL {
+    dll_module: winapi::shared::minwindef::HINSTANCE,
+    call_reason: winapi::shared::minwindef::DWORD,
+    _reserved: winapi::shared::minwindef::LPVOID,
+) -> winapi::shared::minwindef::BOOL {
     use winapi::um::winnt::{DLL_PROCESS_ATTACH, DLL_PROCESS_DETACH};
 
     match call_reason {
@@ -75,5 +79,5 @@ pub extern "system" fn DllMain(
         _ => (),
     }
 
-    return winapi::TRUE;
+    return winapi::shared::minwindef::TRUE;
 }
