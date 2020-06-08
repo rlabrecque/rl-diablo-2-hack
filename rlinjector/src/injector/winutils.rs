@@ -178,15 +178,14 @@ pub fn inject_library(process_handle: winapi::um::winnt::HANDLE, dll_path: &std:
         return false;
     }
 
-    let start_routine =
-        unsafe {
-            Some(::std::mem::transmute::<
-                winapi::shared::minwindef::FARPROC,
-                unsafe extern "system" fn(
-                    lpThreadParameter: winapi::shared::minwindef::LPVOID,
-                ) -> winapi::shared::minwindef::DWORD,
-            >(load_library_address))
-        };
+    let start_routine = unsafe {
+        Some(::std::mem::transmute::<
+            winapi::shared::minwindef::FARPROC,
+            unsafe extern "system" fn(
+                lpThreadParameter: winapi::shared::minwindef::LPVOID,
+            ) -> winapi::shared::minwindef::DWORD,
+        >(load_library_address))
+    };
 
     let mut thread_id: winapi::shared::minwindef::DWORD = 0;
     let thread_id_ptr: *mut winapi::shared::minwindef::DWORD =
@@ -234,13 +233,13 @@ pub fn inject_library(process_handle: winapi::um::winnt::HANDLE, dll_path: &std:
         winapi::um::winnt::MEM_RELEASE,
     );*/
 
-
-
     return true;
 }
 
-
-fn find_module(process_handle: winapi::um::winnt::HANDLE, dll_path: &std::path::Path) -> winapi::shared::minwindef::HMODULE {
+fn find_module(
+    process_handle: winapi::um::winnt::HANDLE,
+    dll_path: &std::path::Path,
+) -> winapi::shared::minwindef::HMODULE {
     let sizeof_hmodule = std::mem::size_of::<winapi::shared::minwindef::HMODULE>();
 
     let mut modules = {
@@ -254,7 +253,12 @@ fn find_module(process_handle: winapi::um::winnt::HANDLE, dll_path: &std::path::
 
     {
         let mut bytes_fetched: winapi::shared::minwindef::DWORD = 0;
-        let ret = windows::enum_process_modules(process_handle, modules.as_mut_ptr(), (modules.len() * sizeof_hmodule) as u32, &mut bytes_fetched);
+        let ret = windows::enum_process_modules(
+            process_handle,
+            modules.as_mut_ptr(),
+            (modules.len() * sizeof_hmodule) as u32,
+            &mut bytes_fetched,
+        );
         assert!(ret, "EnumProcessModules");
 
         let num_entries_fetched = bytes_fetched as usize / sizeof_hmodule;
@@ -279,5 +283,5 @@ fn find_module(process_handle: winapi::um::winnt::HANDLE, dll_path: &std::path::
         }
     }
 
-	return std::ptr::null_mut();
+    return std::ptr::null_mut();
 }

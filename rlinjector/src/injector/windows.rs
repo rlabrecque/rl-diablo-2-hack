@@ -2,19 +2,23 @@ pub fn get_module_base_name(
     process_handle: winapi::um::winnt::HANDLE,
     module: winapi::shared::minwindef::HMODULE,
     base_name: winapi::shared::ntdef::LPWSTR,
-    size: winapi::shared::minwindef::DWORD
+    size: winapi::shared::minwindef::DWORD,
 ) -> winapi::shared::minwindef::DWORD {
-    unsafe {
-        winapi::um::psapi::GetModuleBaseNameW(process_handle, module, base_name, size)
-    }
+    unsafe { winapi::um::psapi::GetModuleBaseNameW(process_handle, module, base_name, size) }
 }
 pub fn enum_process_modules(
     process_handle: winapi::um::winnt::HANDLE,
     out_module_handles: *mut winapi::shared::minwindef::HMODULE,
     out_module_handles_size: winapi::shared::minwindef::DWORD,
-    bytes_needed: winapi::shared::minwindef::LPDWORD) -> bool {
+    bytes_needed: winapi::shared::minwindef::LPDWORD,
+) -> bool {
     unsafe {
-        let ret = winapi::um::psapi::EnumProcessModules(process_handle, out_module_handles, out_module_handles_size, bytes_needed);
+        let ret = winapi::um::psapi::EnumProcessModules(
+            process_handle,
+            out_module_handles,
+            out_module_handles_size,
+            bytes_needed,
+        );
         ret == winapi::shared::minwindef::TRUE
     }
 }
