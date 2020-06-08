@@ -25,11 +25,11 @@ pub fn inject(dll_path: &std::path::PathBuf, process_name: &str) -> Result<(), B
 
         let process_handle: winapi::um::winnt::HANDLE = windows::open_process(
             *process_id,
-            /*winapi::um::winnt::PROCESS_CREATE_THREAD
-                | winapi::um::winnt::PROCESS_QUERY_INFORMATION
-                | winapi::um::winnt::PROCESS_VM_OPERATION
-                | winapi::um::winnt::PROCESS_VM_WRITE
-                | winapi::um::winnt::PROCESS_VM_READ*/winapi::um::winnt::PROCESS_ALL_ACCESS,
+            winapi::um::winnt::PROCESS_CREATE_THREAD
+            | winapi::um::winnt::PROCESS_QUERY_INFORMATION
+            | winapi::um::winnt::PROCESS_VM_OPERATION
+            | winapi::um::winnt::PROCESS_VM_WRITE
+            | winapi::um::winnt::PROCESS_VM_READ,
         );
 
         if process_handle == std::ptr::null_mut() {
