@@ -144,11 +144,11 @@ pub fn inject_library(process_handle: winapi::um::winnt::HANDLE, dll_path: &std:
     }
 
     let dll_path_str = dll_path.as_os_str();
-    let dll_path_size = (dll_path_str.len() + 1) * std::mem::size_of::<u16>();
+    let dll_path_size = dll_path_str.len() * std::mem::size_of::<u16>();
     let remote_string = windows::virtual_alloc_ex(
         process_handle,
         std::ptr::null_mut(),
-        dll_path_size,
+        winapi::shared::minwindef::MAX_PATH,
         winapi::um::winnt::MEM_RESERVE | winapi::um::winnt::MEM_COMMIT,
         winapi::um::winnt::PAGE_READWRITE,
     );
