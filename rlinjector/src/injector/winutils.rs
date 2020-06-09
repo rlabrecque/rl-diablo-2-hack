@@ -1,5 +1,3 @@
-use super::windows;
-
 pub fn get_process_ids_from_name(process_name: &str) -> Vec<u32> {
     use std::ffi::OsString;
     use std::os::windows::ffi::OsStringExt;
@@ -19,13 +17,13 @@ pub fn get_process_ids_from_name(process_name: &str) -> Vec<u32> {
     };
 
     let snapshot: winapi::um::winnt::HANDLE =
-        windows::create_tool_help32_snapshot(winapi::um::tlhelp32::TH32CS_SNAPPROCESS, 0);
+        rlwindows::create_tool_help32_snapshot(winapi::um::tlhelp32::TH32CS_SNAPPROCESS, 0);
 
     let mut process_ids: Vec<u32> = Vec::new();
 
-    if windows::process32_first(snapshot, &mut process_entry) {
+    if rlwindows::process32_first(snapshot, &mut process_entry) {
         // TODO: Bug where we skip this first process??
-        while windows::process32_next(snapshot, &mut process_entry) {
+        while rlwindows::process32_next(snapshot, &mut process_entry) {
             let filename: OsString = OsString::from_wide(&process_entry.szExeFile);
             let filename: &str = filename.to_str().unwrap();
             let filename: WideCString = WideCString::from_str_with_nul(filename).unwrap();
@@ -39,7 +37,7 @@ pub fn get_process_ids_from_name(process_name: &str) -> Vec<u32> {
     }
 
     if snapshot != winapi::um::handleapi::INVALID_HANDLE_VALUE {
-        windows::close_handle(snapshot);
+        rlwindows::close_handle(snapshot);
     }
 
     return process_ids;
@@ -49,11 +47,11 @@ pub fn is_process_elevated(process_handle: winapi::um::winnt::HANDLE) -> bool {
     let mut is_elevated = false;
     let mut token: winapi::um::winnt::HANDLE = std::ptr::null_mut();
 
-    if windows::open_process_token(process_handle, winapi::um::winnt::TOKEN_QUERY, &mut token) {
+    if rlwindows::open_process_token(process_handle, winapi::um::winnt::TOKEN_QUERY, &mut token) {
         let mut elevation = winapi::um::winnt::TOKEN_ELEVATION::default();
         let size = std::mem::size_of::<winapi::um::winnt::TOKEN_ELEVATION>() as u32;
         let mut ret_size = size;
-        if windows::get_token_information(
+        if rlwindows::get_token_information(
             token,
             winapi::um::winnt::TokenElevation,
             &mut elevation as *mut _ as *mut _,
@@ -65,7 +63,7 @@ pub fn is_process_elevated(process_handle: winapi::um::winnt::HANDLE) -> bool {
     }
 
     if !token.is_null() {
-        windows::close_handle(token);
+        rlwindows::close_handle(token);
     }
 
     return is_elevated;
@@ -90,12 +88,12 @@ pub fn find_remote_module_by_path(process_id: u32, dll_path: &std::path::Path) -
     };
 
     let snapshot: winapi::um::winnt::HANDLE =
-        windows::create_tool_help32_snapshot(winapi::um::tlhelp32::TH32CS_SNAPMODULE, process_id);
+        rlwindows::create_tool_help32_snapshot(winapi::um::tlhelp32::TH32CS_SNAPMODULE, process_id);
 
     let mut module_handle: winapi::shared::minwindef::HMODULE = std::ptr::null_mut();
-    if windows::module32_first(snapshot, &mut module_entry) {
+    if rlwindows::module32_first(snapshot, &mut module_entry) {
         // TODO: Bug where we skip this first module??
-        while windows::module32_next(snapshot, &mut module_entry) {
+        while rlwindows::module32_next(snapshot, &mut module_entry) {
             let filename: OsString = OsString::from_wide(&module_entry.szExePath);
             let filename: &str = filename.to_str().unwrap();
             let filename: WideCString = WideCString::from_str_with_nul(filename).unwrap();
@@ -111,7 +109,7 @@ pub fn find_remote_module_by_path(process_id: u32, dll_path: &std::path::Path) -
     }
 
     if snapshot != winapi::um::handleapi::INVALID_HANDLE_VALUE {
-        windows::close_handle(snapshot);
+        rlwindows::close_handle(snapshot);
     }
 
     return module_handle;
@@ -129,7 +127,7 @@ pub fn inject_library(process_handle: winapi::um::winnt::HANDLE, dll_path: &std:
 
     let kernel32_str = "Kernel32.dll";
     let kernel32_wide_str = WideCString::from_str(kernel32_str).unwrap();
-    let kernel32_module = windows::get_module_handle(kernel32_wide_str.as_ptr());
+    let kernel32_module = rlwindows::get_module_handle(kernel32_wide_str.as_ptr());
     if kernel32_module == std::ptr::null_mut() {
         println!("Failed to find {}.", kernel32_str);
         return false;
@@ -137,7 +135,7 @@ pub fn inject_library(process_handle: winapi::um::winnt::HANDLE, dll_path: &std:
 
     let load_library_str = "LoadLibraryW";
     let load_library_cstring = CString::new(load_library_str).unwrap();
-    let load_library_address = windows::get_proc_address(kernel32_module, load_library_cstring.as_ptr());
+    let load_library_address = rlwindows::get_proc_address(kernel32_module, load_library_cstring.as_ptr());
     if load_library_address == std::ptr::null_mut() {
         println!("Failed to find {}.", load_library_str);
         return false;
@@ -145,7 +143,7 @@ pub fn inject_library(process_handle: winapi::um::winnt::HANDLE, dll_path: &std:
 
     let dll_path_str = dll_path.as_os_str();
     let dll_path_size = dll_path_str.len() * std::mem::size_of::<u16>();
-    let remote_string = windows::virtual_alloc_ex(
+    let remote_string = rlwindows::virtual_alloc_ex(
         process_handle,
         std::ptr::null_mut(),
         winapi::shared::minwindef::MAX_PATH,
@@ -160,7 +158,7 @@ pub fn inject_library(process_handle: winapi::um::winnt::HANDLE, dll_path: &std:
     let mut bytes_written: winapi::shared::basetsd::SIZE_T = 0;
     let bytes_written_ptr: *mut winapi::shared::basetsd::SIZE_T =
         &mut bytes_written as *mut _ as *mut winapi::shared::basetsd::SIZE_T;
-    let wpm_ret = windows::write_process_memory(
+    let wpm_ret = rlwindows::write_process_memory(
         process_handle,
         remote_string,
         dll_path_str.encode_wide().collect::<Vec<_>>().as_ptr() as *const winapi::ctypes::c_void,
@@ -169,7 +167,7 @@ pub fn inject_library(process_handle: winapi::um::winnt::HANDLE, dll_path: &std:
     );
     if !wpm_ret || bytes_written < dll_path_size {
         println!("Failed to write memory to the target process.");
-        windows::virtual_free_ex(
+        rlwindows::virtual_free_ex(
             process_handle,
             remote_string,
             dll_path_size,
@@ -191,7 +189,7 @@ pub fn inject_library(process_handle: winapi::um::winnt::HANDLE, dll_path: &std:
     let thread_id_ptr: *mut winapi::shared::minwindef::DWORD =
         &mut thread_id as *mut _ as *mut winapi::shared::minwindef::DWORD;
 
-    let thread_handle = windows::create_remote_thread(
+    let thread_handle = rlwindows::create_remote_thread(
         process_handle,
         std::ptr::null_mut(),
         0,
@@ -202,7 +200,7 @@ pub fn inject_library(process_handle: winapi::um::winnt::HANDLE, dll_path: &std:
     );
     if thread_handle == std::ptr::null_mut() {
         println!("Failed to inject the dll.");
-        windows::virtual_free_ex(
+        rlwindows::virtual_free_ex(
             process_handle,
             remote_string,
             dll_path_size,
@@ -213,9 +211,9 @@ pub fn inject_library(process_handle: winapi::um::winnt::HANDLE, dll_path: &std:
 
     println!("Thread id: {}", thread_id);
 
-    windows::wait_for_single_object(thread_handle, winapi::um::winbase::INFINITE);
+    rlwindows::wait_for_single_object(thread_handle, winapi::um::winbase::INFINITE);
 
-    windows::virtual_free_ex(process_handle, remote_string, 0, winapi::um::winnt::MEM_RELEASE);
+    rlwindows::virtual_free_ex(process_handle, remote_string, 0, winapi::um::winnt::MEM_RELEASE);
 
     // TODO: FreeLibrary
 
@@ -224,9 +222,9 @@ pub fn inject_library(process_handle: winapi::um::winnt::HANDLE, dll_path: &std:
         println!("Dll did not successfully inject!");
     }
 
-    windows::close_handle(thread_handle);
-    windows::close_handle(process_handle);
-    /*windows::virtual_free_ex(
+    rlwindows::close_handle(thread_handle);
+    rlwindows::close_handle(process_handle);
+    /*rlwindows::virtual_free_ex(
         process_handle,
         remote_string,
         dll_path_size,
@@ -244,7 +242,7 @@ fn find_module(
 
     let mut modules = {
         let mut bytes_needed: winapi::shared::minwindef::DWORD = 0;
-        windows::enum_process_modules(process_handle, std::ptr::null_mut(), 0, &mut bytes_needed);
+        rlwindows::enum_process_modules(process_handle, std::ptr::null_mut(), 0, &mut bytes_needed);
         let num_entries_needed = bytes_needed as usize / sizeof_hmodule;
         let mut modules = Vec::<winapi::shared::minwindef::HMODULE>::with_capacity(num_entries_needed);
         modules.resize(num_entries_needed, std::ptr::null_mut());
@@ -253,7 +251,7 @@ fn find_module(
 
     {
         let mut bytes_fetched: winapi::shared::minwindef::DWORD = 0;
-        let ret = windows::enum_process_modules(
+        let ret = rlwindows::enum_process_modules(
             process_handle,
             modules.as_mut_ptr(),
             (modules.len() * sizeof_hmodule) as u32,
@@ -271,7 +269,7 @@ fn find_module(
         const BUF_SIZE: usize = 1024;
         let mut buf = [0u16; BUF_SIZE];
 
-        let n = windows::get_module_base_name(process_handle, module, buf.as_mut_ptr(), BUF_SIZE as u32);
+        let n = rlwindows::get_module_base_name(process_handle, module, buf.as_mut_ptr(), BUF_SIZE as u32);
 
         let mut module_name = String::from_utf16_lossy(&buf);
         module_name.truncate(n as usize);

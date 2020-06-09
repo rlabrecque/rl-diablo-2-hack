@@ -1,0 +1,9 @@
+[package]
+name = "rlwindows"
+version = "0.1.0"
+authors = [ "Riley Labrecque" ]
+edition = "2018"
+license = "MIT OR Apache-2.0"
+
+[dependencies]
+winapi = { version = "0.3", features = [ "tlhelp32", "handleapi", "securitybaseapi", "synchapi", "psapi", "memoryapi", "consoleapi", "debugapi", "impl-default" ] }

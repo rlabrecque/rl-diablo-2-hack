@@ -119,6 +119,7 @@ dependencies = [
 name = "rld2hack"
 version = "0.1.0"
 dependencies = [
+ "rlwindows",
  "winapi",
 ]
 
@@ -126,8 +127,16 @@ dependencies = [
 name = "rlinjector"
 version = "0.1.0"
 dependencies = [
+ "rlwindows",
  "structopt",
  "widestring",
+ "winapi",
+]
+
+[[package]]
+name = "rlwindows"
+version = "0.1.0"
+dependencies = [
  "winapi",
 ]
 

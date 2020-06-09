@@ -6,6 +6,7 @@ pub fn get_module_base_name(
 ) -> winapi::shared::minwindef::DWORD {
     unsafe { winapi::um::psapi::GetModuleBaseNameW(process_handle, module, base_name, size) }
 }
+
 pub fn enum_process_modules(
     process_handle: winapi::um::winnt::HANDLE,
     out_module_handles: *mut winapi::shared::minwindef::HMODULE,
@@ -202,4 +203,31 @@ pub fn open_process_token(
 
 pub fn get_current_process() -> winapi::um::winnt::HANDLE {
     unsafe { winapi::um::processthreadsapi::GetCurrentProcess() }
+}
+
+pub fn disable_thread_library_calls(lib_module: winapi::shared::minwindef::HMODULE) -> bool {
+    unsafe {
+        let ret = winapi::um::libloaderapi::DisableThreadLibraryCalls(lib_module);
+        ret == winapi::shared::minwindef::TRUE
+    }
+}
+
+pub fn create_thread(
+    thread_attributes: winapi::um::minwinbase::LPSECURITY_ATTRIBUTES,
+    stack_size: winapi::shared::basetsd::SIZE_T,
+    start_address: winapi::um::minwinbase::LPTHREAD_START_ROUTINE,
+    parameter: winapi::shared::minwindef::LPVOID,
+    creation_flags: winapi::shared::minwindef::DWORD,
+    thread_id: winapi::shared::minwindef::LPDWORD,
+) -> winapi::um::winnt::HANDLE {
+    unsafe {
+        winapi::um::processthreadsapi::CreateThread(
+            thread_attributes,
+            stack_size,
+            start_address,
+            parameter,
+            creation_flags,
+            thread_id,
+        )
+    }
 }

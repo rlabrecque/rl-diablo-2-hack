@@ -6,6 +6,7 @@ edition = "2018"
 license = "MIT OR Apache-2.0"
 
 [dependencies]
-structopt = "0.3"
-winapi = { version = "0.3", features = [ "tlhelp32", "handleapi", "securitybaseapi", "synchapi", "psapi", "memoryapi", "impl-default" ] }
+structopt  = "0.3"
+winapi     = { version = "0.3", features = [ "tlhelp32", "handleapi", "securitybaseapi", "synchapi", "psapi", "memoryapi", "impl-default" ] }
 widestring = "0.4"
+rlwindows  = { path = "../rlwindows" }

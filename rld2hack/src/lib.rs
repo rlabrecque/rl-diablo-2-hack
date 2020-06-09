@@ -104,7 +104,7 @@ unsafe extern "system" fn dll_attach_wrapper(
 pub extern "system" fn DllMain(
     hinst_dll: winapi::shared::minwindef::HINSTANCE,
     fdw_reason: winapi::shared::minwindef::DWORD,
-    lpv_reserved: winapi::shared::minwindef::LPVOID,
+    _lpv_reserved: winapi::shared::minwindef::LPVOID,
 ) -> winapi::shared::minwindef::BOOL {
     print_dbg(&format!("DllMain: {}", fdw_reason));
 
@@ -114,7 +114,7 @@ pub extern "system" fn DllMain(
             let thread_id_ptr: *mut winapi::shared::minwindef::DWORD =
                 &mut thread_id as *mut _ as *mut winapi::shared::minwindef::DWORD;
 
-            create_thread(
+            rlwindows::create_thread(
                 std::ptr::null_mut(),
                 0,
                 Some(dll_attach_wrapper),
@@ -133,31 +133,4 @@ pub extern "system" fn DllMain(
     }
 
     return winapi::shared::minwindef::TRUE;
-}
-
-fn disable_thread_library_calls(lib_module: winapi::shared::minwindef::HMODULE) -> bool {
-    unsafe {
-        let ret = winapi::um::libloaderapi::DisableThreadLibraryCalls(lib_module);
-        ret == winapi::shared::minwindef::TRUE
-    }
-}
-
-fn create_thread(
-    thread_attributes: winapi::um::minwinbase::LPSECURITY_ATTRIBUTES,
-    stack_size: winapi::shared::basetsd::SIZE_T,
-    start_address: winapi::um::minwinbase::LPTHREAD_START_ROUTINE,
-    parameter: winapi::shared::minwindef::LPVOID,
-    creation_flags: winapi::shared::minwindef::DWORD,
-    thread_id: winapi::shared::minwindef::LPDWORD,
-) -> winapi::um::winnt::HANDLE {
-    unsafe {
-        winapi::um::processthreadsapi::CreateThread(
-            thread_attributes,
-            stack_size,
-            start_address,
-            parameter,
-            creation_flags,
-            thread_id,
-        )
-    }
 }

@@ -11,4 +11,5 @@ crate-type = ["cdylib"]
 [dependencies]
 #detour = "0.7"
 #lazy_static = "1.4"
-winapi = { version = "0.3", features = [ "consoleapi", "debugapi", "impl-default" ] }
+winapi    = { version = "0.3", features = [ "consoleapi", "debugapi", "impl-default" ] }
+rlwindows = { path = "../rlwindows" }

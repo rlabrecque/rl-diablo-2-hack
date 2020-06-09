@@ -1,4 +1,3 @@
-mod windows;
 mod winutils;
 
 #[cfg(target_arch = "x86")]
@@ -6,7 +5,7 @@ pub fn inject(dll_path: &std::path::PathBuf, process_name: &str) -> Result<(), B
     println!("Inject {:#?} {}", dll_path, process_name);
     println!(
         "Are we elevated: {}",
-        winutils::is_process_elevated(windows::get_current_process())
+        winutils::is_process_elevated(rlwindows::get_current_process())
     );
 
     if !dll_path.exists() {
@@ -23,17 +22,17 @@ pub fn inject(dll_path: &std::path::PathBuf, process_name: &str) -> Result<(), B
     for process_id in &process_ids {
         println!("{}", process_id);
 
-        let process_handle: winapi::um::winnt::HANDLE = windows::open_process(
+        let process_handle: winapi::um::winnt::HANDLE = rlwindows::open_process(
             *process_id,
             winapi::um::winnt::PROCESS_CREATE_THREAD
-            | winapi::um::winnt::PROCESS_QUERY_INFORMATION
-            | winapi::um::winnt::PROCESS_VM_OPERATION
-            | winapi::um::winnt::PROCESS_VM_WRITE
-            | winapi::um::winnt::PROCESS_VM_READ,
+                | winapi::um::winnt::PROCESS_QUERY_INFORMATION
+                | winapi::um::winnt::PROCESS_VM_OPERATION
+                | winapi::um::winnt::PROCESS_VM_WRITE
+                | winapi::um::winnt::PROCESS_VM_READ,
         );
 
         if process_handle == std::ptr::null_mut() {
-            windows::print_get_last_err();
+            rlwindows::print_get_last_err();
             println!("Process with id {:?} does not exist or is not accessible.", process_id);
             continue;
         }
@@ -55,7 +54,7 @@ pub fn inject(dll_path: &std::path::PathBuf, process_name: &str) -> Result<(), B
 
         println!("Closing process {}", process_id);
         if process_handle != std::ptr::null_mut() {
-            windows::close_handle(process_handle);
+            rlwindows::close_handle(process_handle);
         }
     }
 
