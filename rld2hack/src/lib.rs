@@ -4,6 +4,8 @@ compile_error!("This only works on Windows.");
 #[cfg(not(target_arch = "x86"))]
 compile_error!("This only works on 32bit.");
 
+mod library;
+
 //use detour::static_detour;
 //use lazy_static;
 
@@ -63,16 +65,22 @@ fn init() {
     hook.call(100.0, std::ptr::null_mut());*/
 }
 
-fn print_dbg(msg: &str) {
-    let load_library_cstring = std::ffi::CString::new(msg).unwrap();
+pub fn print_dbg(msg: &str) {
+    let msg_cstring = std::ffi::CString::new(msg).unwrap();
     unsafe {
-        winapi::um::debugapi::OutputDebugStringA(load_library_cstring.as_ptr());
+        winapi::um::debugapi::OutputDebugStringA(msg_cstring.as_ptr());
     }
     println!("{}", msg);
 }
 
 fn dll_attach(_base: winapi::shared::minwindef::LPVOID) {
     print_dbg("Attach!");
+
+    std::thread::sleep(std::time::Duration::from_secs(5));
+
+    let game = library::Library::new("Game.exe".to_owned());
+
+    print_dbg(&format!("Offset: {:#?}", game.handle));
 }
 
 fn dll_detach() {
@@ -90,8 +98,6 @@ unsafe extern "system" fn dll_attach_wrapper(
         }
         Ok(_) => {}
     }
-
-    std::thread::sleep(std::time::Duration::from_secs(5));
 
     winapi::um::libloaderapi::FreeLibraryAndExitThread(base as _, 1);
 
