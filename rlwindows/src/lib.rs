@@ -231,3 +231,14 @@ pub fn create_thread(
         )
     }
 }
+
+pub fn load_library(file_name: winapi::shared::ntdef::LPCWSTR) -> winapi::shared::minwindef::HMODULE {
+    unsafe { winapi::um::libloaderapi::LoadLibraryW(file_name) }
+}
+
+pub fn free_library(module_handle: winapi::shared::minwindef::HMODULE) -> bool {
+    unsafe {
+        let ret = winapi::um::libloaderapi::FreeLibrary(module_handle);
+        ret == winapi::shared::minwindef::TRUE
+    }
+}
