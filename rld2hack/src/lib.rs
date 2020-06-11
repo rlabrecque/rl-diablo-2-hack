@@ -79,11 +79,21 @@ fn dll_attach(base: winapi::shared::minwindef::LPVOID) {
 
     print_dbg("Attach!");
 
-    std::thread::sleep(std::time::Duration::from_secs(5));
-
     let game = library::Library::new("Game.exe".to_owned());
 
     print_dbg(&format!("Offset: {:#?}", game.handle));
+
+    for _ in 0..20 {
+        unsafe {
+            let ping: &u32 = game.read(0x3A04A4 as usize);
+            let skip: &u32 = game.read(0x3A04B0 as usize);
+            let fps: &u32 = game.read(0x3BB390 as usize);
+            print_dbg(&format!("ping: {}", ping));
+            print_dbg(&format!("skip: {}", skip));
+            print_dbg(&format!("fps: {}", fps));
+            std::thread::sleep(std::time::Duration::from_millis(250));
+        }
+    }
 }
 
 fn dll_detach() {
