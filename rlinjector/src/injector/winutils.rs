@@ -45,14 +45,14 @@ pub fn get_process_ids_from_name(process_name: &str) -> Vec<u32> {
 
 pub fn is_process_elevated(process_handle: winapi::um::winnt::HANDLE) -> bool {
     let mut is_elevated = false;
-    let mut token: winapi::um::winnt::HANDLE = std::ptr::null_mut();
+    let mut token_handle: winapi::um::winnt::HANDLE = std::ptr::null_mut();
 
-    if rlwindows::open_process_token(process_handle, winapi::um::winnt::TOKEN_QUERY, &mut token) {
+    if rlwindows::open_process_token(process_handle, winapi::um::winnt::TOKEN_QUERY, &mut token_handle) {
         let mut elevation = winapi::um::winnt::TOKEN_ELEVATION::default();
         let size = std::mem::size_of::<winapi::um::winnt::TOKEN_ELEVATION>() as u32;
         let mut ret_size = size;
         if rlwindows::get_token_information(
-            token,
+            token_handle,
             winapi::um::winnt::TokenElevation,
             &mut elevation as *mut _ as *mut _,
             size,
@@ -62,8 +62,8 @@ pub fn is_process_elevated(process_handle: winapi::um::winnt::HANDLE) -> bool {
         }
     }
 
-    if !token.is_null() {
-        rlwindows::close_handle(token);
+    if !token_handle.is_null() {
+        rlwindows::close_handle(token_handle);
     }
 
     return is_elevated;
