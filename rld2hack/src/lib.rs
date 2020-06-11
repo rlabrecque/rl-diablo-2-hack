@@ -73,7 +73,10 @@ pub fn print_dbg(msg: &str) {
     println!("{}", msg);
 }
 
-fn dll_attach(_base: winapi::shared::minwindef::LPVOID) {
+fn dll_attach(base: winapi::shared::minwindef::LPVOID) {
+    rlwindows::alloc_console();
+    rlwindows::disable_thread_library_calls(base as _);
+
     print_dbg("Attach!");
 
     std::thread::sleep(std::time::Duration::from_secs(5));
@@ -90,16 +93,14 @@ fn dll_detach() {
 unsafe extern "system" fn dll_attach_wrapper(
     base: winapi::shared::minwindef::LPVOID,
 ) -> winapi::shared::minwindef::DWORD {
-    use std::panic;
-
-    match panic::catch_unwind(|| dll_attach(base)) {
+    match std::panic::catch_unwind(|| dll_attach(base)) {
         Err(e) => {
             print_dbg(&format!("`dll_attach` has panicked: {:#?}", e));
         }
         Ok(_) => {}
     }
 
-    winapi::um::libloaderapi::FreeLibraryAndExitThread(base as _, 1);
+    rlwindows::free_library_and_exit_thread(base as _, 1);
 
     // This won't be executed because the
     unreachable!()

@@ -242,3 +242,19 @@ pub fn free_library(module_handle: winapi::shared::minwindef::HMODULE) -> bool {
         ret == winapi::shared::minwindef::TRUE
     }
 }
+
+pub fn alloc_console() -> bool {
+    unsafe {
+        let ret = winapi::um::consoleapi::AllocConsole();
+        ret == winapi::shared::minwindef::TRUE
+    }
+}
+
+pub fn free_library_and_exit_thread(
+    module_handle: winapi::shared::minwindef::HMODULE,
+    exit_code: winapi::shared::minwindef::DWORD,
+) {
+    unsafe {
+        winapi::um::libloaderapi::FreeLibraryAndExitThread(module_handle, exit_code);
+    }
+}
