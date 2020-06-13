@@ -4,7 +4,10 @@ compile_error!("This only works on Windows.");
 #[cfg(not(target_arch = "x86"))]
 compile_error!("This only works on 32bit.");
 
+mod d2;
 mod library;
+
+use library::Library;
 
 //use detour::static_detour;
 //use lazy_static;
@@ -79,20 +82,24 @@ fn dll_attach(base: winapi::shared::minwindef::LPVOID) {
 
     print_dbg("Attach!");
 
-    let game = library::Library::new("Game.exe".to_owned());
+    let game = Library::new("Game.exe".to_owned());
 
     print_dbg(&format!("Offset: {:#?}", game.handle));
 
-    for _ in 0..20 {
-        unsafe {
-            let ping: &u32 = game.read(0x3A04A4 as usize);
-            let skip: &u32 = game.read(0x3A04B0 as usize);
-            let fps: &u32 = game.read(0x3BB390 as usize);
-            print_dbg(&format!("ping: {}", ping));
-            print_dbg(&format!("skip: {}", skip));
-            print_dbg(&format!("fps: {}", fps));
-            std::thread::sleep(std::time::Duration::from_millis(250));
-        }
+    for _ in 0..15 {
+        print_dbg(&format!("ScreenSize: {}x{}", d2::get_screensize_x(&game), d2::get_screensize_y(&game)));
+        print_dbg(&format!("Cursor Hover: {}, {}", d2::get_cursor_hover_x(&game), d2::get_cursor_hover_y(&game)));
+        print_dbg(&format!("Mouse Pos: {}, {}", d2::get_mouse_pos_x(&game), d2::get_mouse_pos_y(&game)));
+        print_dbg(&format!("Mouse Offset: {}, {}, {}", d2::get_mouse_offset_y(&game), d2::get_mouse_offset_z(&game), d2::get_mouse_offset_x(&game)));
+        print_dbg(&format!("FPS: {}", d2::get_fps(&game)));
+        print_dbg(&format!("Skip: {}", d2::get_skip(&game)));
+        print_dbg(&format!("Ping: {}", d2::get_ping(&game)));
+        print_dbg(&format!("Lang: {}", d2::get_lang(&game)));
+        print_dbg(&format!("Divisor: {}", d2::get_divisor(&game)));
+        print_dbg(&format!("Regular Cursor Type: {}", d2::get_regular_cursor_type(&game)));
+        print_dbg(&format!("Shop Cursor Type: {}", d2::get_shop_cursor_type(&game)));
+        print_dbg(&format!("NPC Menu Amount: {}", d2::get_npc_menu_amount(&game)));
+        std::thread::sleep(std::time::Duration::from_millis(500));
     }
 }
 
