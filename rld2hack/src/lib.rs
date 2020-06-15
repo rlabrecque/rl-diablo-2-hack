@@ -90,67 +90,67 @@ fn dll_attach(base: winapi::shared::minwindef::LPVOID) {
         print_dbg("");
         print_dbg(&format!(
             "ScreenSize: {}x{}",
-            d2::get_screensize_x(&game),
-            d2::get_screensize_y(&game)
+            d2::variables::get_screensize_x(&game),
+            d2::variables::get_screensize_y(&game)
         ));
         print_dbg(&format!(
             "Cursor Hover: ({}, {})",
-            d2::get_cursor_hover_x(&game),
-            d2::get_cursor_hover_y(&game)
+            d2::variables::get_cursor_hover_x(&game),
+            d2::variables::get_cursor_hover_y(&game)
         ));
         print_dbg(&format!(
             "Mouse Pos: ({}, {})",
-            d2::get_mouse_pos_x(&game),
-            d2::get_mouse_pos_y(&game)
+            d2::variables::get_mouse_pos_x(&game),
+            d2::variables::get_mouse_pos_y(&game)
         ));
         print_dbg(&format!(
             "Mouse Offset: ({}, {}, {})",
-            d2::get_mouse_offset_y(&game),
-            d2::get_mouse_offset_z(&game),
-            d2::get_mouse_offset_x(&game)
+            d2::variables::get_mouse_offset_y(&game),
+            d2::variables::get_mouse_offset_z(&game),
+            d2::variables::get_mouse_offset_x(&game)
         ));
         print_dbg(&format!(
             "Automap: On: {} Mode: {} Offset: {}",
-            d2::get_automap_on(&game),
-            d2::get_automap_mode(&game),
-            d2::get_automap_offset(&game)
+            d2::variables::get_automap_on(&game),
+            d2::variables::get_automap_mode(&game),
+            d2::variables::get_automap_offset(&game)
         ));
         print_dbg(&format!(
             "Viewport: ({}, {})",
-            d2::get_viewport_x(&game),
-            d2::get_viewport_y(&game)
+            d2::variables::get_viewport_x(&game),
+            d2::variables::get_viewport_y(&game)
         ));
         print_dbg(&format!(
             "Gold Dialog: Action: {} Amount: {}",
-            d2::get_gold_dialog_action(&game),
-            d2::get_gold_dialog_amount(&game)
+            d2::variables::get_gold_dialog_action(&game),
+            d2::variables::get_gold_dialog_amount(&game)
         ));
-        print_dbg(&format!("NPC Menu Amount: {}", d2::get_npc_menu_amount(&game)));
-        print_dbg(&format!("Regular Cursor Type: {}", d2::get_regular_cursor_type(&game)));
-        print_dbg(&format!("Shop Cursor Type: {}", d2::get_shop_cursor_type(&game)));
-        print_dbg(&format!("FPS: {}", d2::get_fps(&game)));
-        print_dbg(&format!("Skip: {}", d2::get_skip(&game)));
-        print_dbg(&format!("Ping: {}", d2::get_ping(&game)));
-        print_dbg(&format!("Lang: {}", d2::get_lang(&game)));
-        print_dbg(&format!("Divisor: {}", d2::get_divisor(&game)));
-        print_dbg(&format!("Overhead Trigger: {}", d2::get_overhead_trigger(&game)));
-        print_dbg(&format!("Recent Interact Id: {}", d2::get_recent_interact_id(&game)));
-        print_dbg(&format!("Item Price List: {}", d2::get_item_price_list(&game)));
-        print_dbg(&format!("Waypoint Table: {}", d2::get_waypoint_table(&game)));
-        print_dbg(&format!("Is Weapon Swapped: {}", d2::get_is_weapon_swapped(&game)));
+        print_dbg(&format!("NPC Menu Amount: {}", d2::variables::get_npc_menu_amount(&game)));
+        print_dbg(&format!("Regular Cursor Type: {}", d2::variables::get_regular_cursor_type(&game)));
+        print_dbg(&format!("Shop Cursor Type: {}", d2::variables::get_shop_cursor_type(&game)));
+        print_dbg(&format!("FPS: {}", d2::variables::get_fps(&game)));
+        print_dbg(&format!("Skip: {}", d2::variables::get_skip(&game)));
+        print_dbg(&format!("Ping: {}", d2::variables::get_ping(&game)));
+        print_dbg(&format!("Lang: {}", d2::variables::get_lang(&game)));
+        print_dbg(&format!("Divisor: {}", d2::variables::get_divisor(&game)));
+        print_dbg(&format!("Overhead Trigger: {}", d2::variables::get_overhead_trigger(&game)));
+        print_dbg(&format!("Recent Interact Id: {}", d2::variables::get_recent_interact_id(&game)));
+        print_dbg(&format!("Item Price List: {}", d2::variables::get_item_price_list(&game)));
+        print_dbg(&format!("Waypoint Table: {}", d2::variables::get_waypoint_table(&game)));
+        print_dbg(&format!("Is Weapon Swapped: {}", d2::variables::get_is_weapon_swapped(&game)));
         print_dbg(&format!(
             "Trade: Accepted: {} Blocked: {} Recent Trade Id: {}",
-            d2::get_is_trade_accepted(&game),
-            d2::get_is_trade_block(&game),
-            d2::get_recent_trade_id(&game)
+            d2::variables::get_is_trade_accepted(&game),
+            d2::variables::get_is_trade_block(&game),
+            d2::variables::get_recent_trade_id(&game)
         ));
-        print_dbg(&format!("Exp Char Flag: {}", d2::get_exp_char_flag(&game)));
-        print_dbg(&format!("Map Id: {}", d2::get_map_id(&game)));
-        print_dbg(&format!("Always Run: {}", d2::get_always_run(&game)));
-        print_dbg(&format!("No Pickup: {}", d2::get_no_pickup(&game)));
-        print_dbg(&format!("Chat Message: {}", d2::get_chat_message(&game)));
-        print_dbg(&format!("Orfice Id: {}", d2::get_orifice_id(&game)));
-        print_dbg(&format!("Cursor Item Mode: {}", d2::get_cursor_item_mode(&game)));
+        print_dbg(&format!("Exp Char Flag: {}", d2::variables::get_exp_char_flag(&game)));
+        print_dbg(&format!("Map Id: {}", d2::variables::get_map_id(&game)));
+        print_dbg(&format!("Always Run: {}", d2::variables::get_always_run(&game)));
+        print_dbg(&format!("No Pickup: {}", d2::variables::get_no_pickup(&game)));
+        print_dbg(&format!("Chat Message: {}", d2::variables::get_chat_message(&game)));
+        print_dbg(&format!("Orfice Id: {}", d2::variables::get_orifice_id(&game)));
+        print_dbg(&format!("Cursor Item Mode: {}", d2::variables::get_cursor_item_mode(&game)));
         print_dbg("");
         print_dbg(&format!("Difficulty: {}", d2::functions::get_difficulty(&game)));
         std::thread::sleep(std::time::Duration::from_millis(1000));
