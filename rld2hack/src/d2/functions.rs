@@ -63,9 +63,7 @@ pub fn exit_game(game: &Library) {
 pub fn get_difficulty(game: &Library) -> u8 {
     type GetDifficultyFn = extern "stdcall" fn() -> u8;
 
-    unsafe {
-        std::mem::transmute::<usize, GetDifficultyFn>(game.fix_offset(0x4DCD0usize))()
-    }
+    unsafe { std::mem::transmute::<usize, GetDifficultyFn>(game.fix_offset(0x4DCD0usize))() }
 }
 
 /*
