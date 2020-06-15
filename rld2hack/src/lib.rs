@@ -116,7 +116,13 @@ fn dll_attach(base: winapi::shared::minwindef::LPVOID) {
         print_dbg(&format!("Chat Message: {}", d2::get_chat_message(&game)));
         print_dbg(&format!("Orfice Id: {}", d2::get_orifice_id(&game)));
         print_dbg(&format!("Cursor Item Mode: {}", d2::get_cursor_item_mode(&game)));
+        print_dbg("");
+        print_dbg(&format!("Difficulty: {}", d2::functions::get_difficulty(&game)));
         std::thread::sleep(std::time::Duration::from_millis(1000));
+
+        /*if i > 3 {
+            d2::functions::exit_game(&game);
+        }*/
     }
 }
 

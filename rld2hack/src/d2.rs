@@ -1,3 +1,5 @@
+pub mod functions;
+
 use crate::library::Library;
 
 pub struct AutomapOffset {

@@ -24,7 +24,7 @@ impl Library {
         !self.handle.is_null()
     }
 
-    fn fix_offset(&self, offset: usize) -> usize {
+    pub fn fix_offset(&self, offset: usize) -> usize {
         (self.handle as usize) + offset
     }
 
