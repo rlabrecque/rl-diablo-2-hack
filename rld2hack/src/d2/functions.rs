@@ -38,11 +38,31 @@ FUNCPTR(D2CLIENT, ClickMap, void __fastcall, (DWORD MouseFlag, DWORD x, DWORD y,
 FUNCPTR(D2CLIENT, LeftClickItem_I, void __stdcall,
         (UnitAny * pPlayer, Inventory* pInventory, int x, int y, DWORD dwClickType, InventoryLayout* pLayout, DWORD Location),
         0x8FFE0) // Updated 1.14d //0048FFE0-BASE
+*/
 
-FUNCPTR(D2CLIENT, GetMouseXOffset, DWORD __fastcall, (VOID), 0x5AFC0) // Updated 1.14d //0045AFC0-BASE
-FUNCPTR(D2CLIENT, GetMouseYOffset, DWORD __fastcall, (VOID), 0x5AFB0) // Updated 1.14d //0045AFB0-BASE
+pub fn get_mouse_x_offset(game: &Library) -> u32 {
+    type GetMouseXOffsetFn = extern "fastcall" fn() -> u32;
 
-FUNCPTR(D2CLIENT, PrintGameString, void __fastcall, (wchar_t * wMessage, int nColor), 0x9E3A0)  // Updated 1.14d //0049E3A0-BASE
+    unsafe { std::mem::transmute::<usize, GetMouseXOffsetFn>(game.fix_offset(0x5AFB0usize))() }
+}
+
+pub fn get_mouse_y_offset(game: &Library) -> u32 {
+    type GetMouseYOffsetFn = extern "fastcall" fn() -> u32;
+
+    unsafe { std::mem::transmute::<usize, GetMouseYOffsetFn>(game.fix_offset(0x5AFC0usize))() }
+}
+
+pub fn print_game_string(game: &Library, message: &str, color: i32) {
+    type PrintGameStringFn = extern "fastcall" fn(message: *const u16, color: i32);
+
+    unsafe {
+        let widestr = widestring::WideCString::from_str(message).unwrap();
+        std::mem::transmute::<usize, PrintGameStringFn>(game.fix_offset(0x9E3A0usize))(widestr.into_raw(), 0);
+        // TODO: Memory leak on widestr
+    }
+}
+
+/*
 FUNCPTR(D2CLIENT, PrintPartyString, void __fastcall, (wchar_t * wMessage, int nColor), 0x9E5C0) // Updated 1.14d //0049E5C0-BASE
 
 FUNCPTR(D2CLIENT, LeaveParty, void __fastcall, (void), 0x79FC0) // Updated 1.14d //00479FC0-BASE
@@ -83,5 +103,10 @@ FUNCPTR(D2CLIENT, CloseNPCTalk, DWORD __stdcall, (void* unk), 0xA17D0) // Update
 
 FUNCPTR(D2CLIENT, TestPvpFlag, DWORD __fastcall, (DWORD dwUnitId1, DWORD dwUnitId2, DWORD dwFlag), 0xDC440) // Updated 1.14d //004DC440-BASE
 
-FUNCPTR(D2CLIENT, GetGameLanguageCode, DWORD __fastcall, (), 0x125150) // New 1.14d //00525150-BASE
 */
+
+pub fn get_game_language_code(game: &Library) -> u32 {
+    type GetGameLanguageCodeFn = extern "fastcall" fn() -> u32;
+
+    unsafe { std::mem::transmute::<usize, GetGameLanguageCodeFn>(game.fix_offset(0x125150usize))() }
+}

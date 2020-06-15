@@ -86,7 +86,7 @@ fn dll_attach(base: winapi::shared::minwindef::LPVOID) {
 
     print_dbg(&format!("Offset: {:#?}", game.handle));
 
-    for _ in 0..40 {
+    for _ in 0..15 {
         print_dbg("");
         print_dbg(&format!(
             "ScreenSize: {}x{}",
@@ -125,19 +125,40 @@ fn dll_attach(base: winapi::shared::minwindef::LPVOID) {
             d2::variables::get_gold_dialog_action(&game),
             d2::variables::get_gold_dialog_amount(&game)
         ));
-        print_dbg(&format!("NPC Menu Amount: {}", d2::variables::get_npc_menu_amount(&game)));
-        print_dbg(&format!("Regular Cursor Type: {}", d2::variables::get_regular_cursor_type(&game)));
-        print_dbg(&format!("Shop Cursor Type: {}", d2::variables::get_shop_cursor_type(&game)));
+        print_dbg(&format!(
+            "NPC Menu Amount: {}",
+            d2::variables::get_npc_menu_amount(&game)
+        ));
+        print_dbg(&format!(
+            "Regular Cursor Type: {}",
+            d2::variables::get_regular_cursor_type(&game)
+        ));
+        print_dbg(&format!(
+            "Shop Cursor Type: {}",
+            d2::variables::get_shop_cursor_type(&game)
+        ));
         print_dbg(&format!("FPS: {}", d2::variables::get_fps(&game)));
         print_dbg(&format!("Skip: {}", d2::variables::get_skip(&game)));
         print_dbg(&format!("Ping: {}", d2::variables::get_ping(&game)));
         print_dbg(&format!("Lang: {}", d2::variables::get_lang(&game)));
         print_dbg(&format!("Divisor: {}", d2::variables::get_divisor(&game)));
-        print_dbg(&format!("Overhead Trigger: {}", d2::variables::get_overhead_trigger(&game)));
-        print_dbg(&format!("Recent Interact Id: {}", d2::variables::get_recent_interact_id(&game)));
-        print_dbg(&format!("Item Price List: {}", d2::variables::get_item_price_list(&game)));
+        print_dbg(&format!(
+            "Overhead Trigger: {}",
+            d2::variables::get_overhead_trigger(&game)
+        ));
+        print_dbg(&format!(
+            "Recent Interact Id: {}",
+            d2::variables::get_recent_interact_id(&game)
+        ));
+        print_dbg(&format!(
+            "Item Price List: {}",
+            d2::variables::get_item_price_list(&game)
+        ));
         print_dbg(&format!("Waypoint Table: {}", d2::variables::get_waypoint_table(&game)));
-        print_dbg(&format!("Is Weapon Swapped: {}", d2::variables::get_is_weapon_swapped(&game)));
+        print_dbg(&format!(
+            "Is Weapon Swapped: {}",
+            d2::variables::get_is_weapon_swapped(&game)
+        ));
         print_dbg(&format!(
             "Trade: Accepted: {} Blocked: {} Recent Trade Id: {}",
             d2::variables::get_is_trade_accepted(&game),
@@ -150,9 +171,22 @@ fn dll_attach(base: winapi::shared::minwindef::LPVOID) {
         print_dbg(&format!("No Pickup: {}", d2::variables::get_no_pickup(&game)));
         print_dbg(&format!("Chat Message: {}", d2::variables::get_chat_message(&game)));
         print_dbg(&format!("Orfice Id: {}", d2::variables::get_orifice_id(&game)));
-        print_dbg(&format!("Cursor Item Mode: {}", d2::variables::get_cursor_item_mode(&game)));
+        print_dbg(&format!(
+            "Cursor Item Mode: {}",
+            d2::variables::get_cursor_item_mode(&game)
+        ));
         print_dbg("");
         print_dbg(&format!("Difficulty: {}", d2::functions::get_difficulty(&game)));
+        print_dbg(&format!(
+            "Game Language Code: {}",
+            d2::functions::get_game_language_code(&game)
+        ));
+        print_dbg(&format!(
+            "Mouse Offset: ({}, {})",
+            d2::functions::get_mouse_x_offset(&game),
+            d2::functions::get_mouse_y_offset(&game)
+        ));
+        d2::functions::print_game_string(&game, "I love you", 0);
         std::thread::sleep(std::time::Duration::from_millis(1000));
 
         /*if i > 3 {
