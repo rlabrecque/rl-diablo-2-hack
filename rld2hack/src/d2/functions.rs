@@ -57,13 +57,24 @@ pub fn print_game_string(game: &Library, message: &str, color: i32) {
 
     unsafe {
         let widestr = widestring::WideCString::from_str(message).unwrap();
-        std::mem::transmute::<usize, PrintGameStringFn>(game.fix_offset(0x9E3A0usize))(widestr.into_raw(), 0);
-        // TODO: Memory leak on widestr
+        let widestr = widestr.into_raw();
+        std::mem::transmute::<usize, PrintGameStringFn>(game.fix_offset(0x9E3A0usize))(widestr, color);
+        let _ = widestring::WideCString::from_raw(widestr);
+    }
+}
+
+pub fn print_party_string(game: &Library, message: &str, color: i32) {
+    type PrintPartyStringFn = extern "fastcall" fn(message: *const u16, color: i32);
+
+    unsafe {
+        let widestr = widestring::WideCString::from_str(message).unwrap();
+        let widestr = widestr.into_raw();
+        std::mem::transmute::<usize, PrintPartyStringFn>(game.fix_offset(0x9E5C0usize))(widestr, color);
+        let _ = widestring::WideCString::from_raw(widestr);
     }
 }
 
 /*
-FUNCPTR(D2CLIENT, PrintPartyString, void __fastcall, (wchar_t * wMessage, int nColor), 0x9E5C0) // Updated 1.14d //0049E5C0-BASE
 
 FUNCPTR(D2CLIENT, LeaveParty, void __fastcall, (void), 0x79FC0) // Updated 1.14d //00479FC0-BASE
 

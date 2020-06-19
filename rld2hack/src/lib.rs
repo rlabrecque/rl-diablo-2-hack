@@ -187,11 +187,13 @@ fn dll_attach(base: winapi::shared::minwindef::LPVOID) {
             d2::functions::get_mouse_y_offset(&game)
         ));
         d2::functions::print_game_string(&game, "I love you", 0);
-        std::thread::sleep(std::time::Duration::from_millis(1000));
+        d2::functions::print_party_string(&game, "Spam", 1);
 
         /*if i > 3 {
             d2::functions::exit_game(&game);
         }*/
+
+        std::thread::sleep(std::time::Duration::from_millis(1000));
     }
 }
 
