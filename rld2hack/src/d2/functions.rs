@@ -24,11 +24,31 @@ FUNCPTR(D2CLIENT, GetUnitY, int __fastcall, (UnitAny * pUnit), 0x5AE20)         
 
 FUNCPTR(D2CLIENT, ShopAction, void __fastcall, (UnitAny * pNpc, UnitAny* pItem, DWORD dwSell, DWORD unk, DWORD dwItemCost, DWORD dwMode, DWORD _2, DWORD _3),
         0xB3870) // Updated 1.14d //004B3870-BASE
+*/
 
-FUNCPTR(D2CLIENT, CloseNPCInteract, void __fastcall, (void), 0xB3F10) // Updated 1.14d //004B3F10-BASE
-FUNCPTR(D2CLIENT, CloseInteract, void __fastcall, (void), 0x4C6B0)    // Updated 1.14d //0044C6B0-BASE
+pub fn close_npc_interact(game: &Library) {
+    type CloseNPCInteractFn = extern "fastcall" fn();
 
-FUNCPTR(D2CLIENT, GetAutomapSize, DWORD __stdcall, (void), 0x5A710)                                                     // Updated 1.14d //0045A710-BASE
+    unsafe {
+        std::mem::transmute::<usize, CloseNPCInteractFn>(game.fix_offset(0xB3F10usize))();
+    }
+}
+
+pub fn close_interact(game: &Library) {
+    type CloseInteractFn = extern "fastcall" fn();
+
+    unsafe {
+        std::mem::transmute::<usize, CloseInteractFn>(game.fix_offset(0x4C6B0usize))();
+    }
+}
+
+pub fn get_automap_size(game: &Library) -> u32 {
+    type GetAutomapSizeFn = extern "fastcall" fn() -> u32;
+
+    unsafe { std::mem::transmute::<usize, GetAutomapSizeFn>(game.fix_offset(0x5A710usize))() }
+}
+
+/*
 FUNCPTR(D2CLIENT, NewAutomapCell, AutomapCell* __fastcall, (), 0x57C30)                                                 // Updated 1.14d //00457C30-BASE
 FUNCPTR(D2CLIENT, AddAutomapCell, void __fastcall, (AutomapCell * aCell, AutomapCell** node), 0x57B00)                  // Updated 1.14d //00457B00-BASE
 FUNCPTR(D2CLIENT, RevealAutomapRoom, void __stdcall, (Room1 * pRoom1, DWORD dwClipFlag, AutomapLayer* aLayer), 0x58F40) // Updated 1.14d //00458F40-BASE

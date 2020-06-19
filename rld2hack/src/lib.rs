@@ -176,6 +176,7 @@ fn dll_attach(base: winapi::shared::minwindef::LPVOID) {
             d2::variables::get_cursor_item_mode(&game)
         ));
         print_dbg("");
+        print_dbg(&format!("Automap Size: {}", d2::functions::get_automap_size(&game)));
         print_dbg(&format!("Difficulty: {}", d2::functions::get_difficulty(&game)));
         print_dbg(&format!(
             "Game Language Code: {}",
@@ -189,9 +190,9 @@ fn dll_attach(base: winapi::shared::minwindef::LPVOID) {
         d2::functions::print_game_string(&game, "I love you", 0);
         d2::functions::print_party_string(&game, "Spam", 1);
 
-        /*if i > 3 {
-            d2::functions::exit_game(&game);
-        }*/
+        //d2::functions::close_npc_interact(&game);
+        //d2::functions::close_interact(&game);
+        //d2::functions::exit_game(&game);
 
         std::thread::sleep(std::time::Duration::from_millis(1000));
     }
