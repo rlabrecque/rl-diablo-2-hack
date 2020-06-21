@@ -130,12 +130,12 @@ fn dll_attach(base: winapi::shared::minwindef::LPVOID) {
             d2::functions::get_mouse_x_offset(&game),
             d2::functions::get_mouse_y_offset(&game)
         ));
-        //d2::functions::print_game_string(&game, "I love you", 0);
+        d2::functions::print_game_string(&d2core, "I love you", 0);
         //d2::functions::print_party_string(&game, "Spam", 1);
 
         //d2::functions::close_npc_interact(&game);
         //d2::functions::close_interact(&game);
-        d2::functions::exit_game(&d2core);
+        //d2::functions::exit_game(&d2core);
 
         std::thread::sleep(std::time::Duration::from_millis(1000));
     }

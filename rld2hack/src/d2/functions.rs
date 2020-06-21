@@ -75,13 +75,32 @@ pub fn get_mouse_y_offset(game: &Library) -> u32 {
     unsafe { std::mem::transmute::<usize, GetMouseYOffsetFn>(game.fix_offset(0x5AFC0usize))() }
 }
 
-pub fn print_game_string(game: &Library, message: &str, color: i32) {
-    type PrintGameStringFn = extern "fastcall" fn(message: *const u16, color: i32);
+pub type PrintGameStringFn = extern "fastcall" fn(message: *const u16, color: i32);
 
+pub fn create_hook_print_game_string(game: &Library) -> GenericDetour<PrintGameStringFn> {
+    unsafe {
+        let print_game_string_fn: PrintGameStringFn = std::mem::transmute(game.fix_offset(0x9E3A0));
+
+        let print_game_string_detour =
+            GenericDetour::<PrintGameStringFn>::new(print_game_string_fn, print_game_string_hook).unwrap();
+        print_game_string_detour.enable().unwrap();
+        print_game_string_detour
+    }
+}
+
+extern "fastcall" fn print_game_string_hook(message: *const u16, color: i32) {
+    let msg = unsafe { widestring::WideCStr::from_ptr_str(message).to_string_lossy() };
+
+    println!("print_game_string_hook: {} {}", color, msg);
+
+    D2Core::get().print_game_string_detour.call(message, color);
+}
+
+pub fn print_game_string(d2core: &D2Core, message: &str, color: i32) {
     unsafe {
         let widestr = widestring::WideCString::from_str(message).unwrap();
         let widestr = widestr.into_raw();
-        std::mem::transmute::<usize, PrintGameStringFn>(game.fix_offset(0x9E3A0usize))(widestr, color);
+        d2core.print_game_string_detour.call(widestr, color);
         let _ = widestring::WideCString::from_raw(widestr);
     }
 }
