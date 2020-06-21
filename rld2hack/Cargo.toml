@@ -9,8 +9,7 @@ license = "MIT OR Apache-2.0"
 crate-type = ["cdylib"]
 
 [dependencies]
-#detour = "0.7"
-#lazy_static = "1.4"
-winapi    = { version = "0.3", features = [ "consoleapi", "debugapi", "impl-default" ] }
-rlwindows = { path = "../rlwindows" }
+detour     = "0.7"
+rlwindows  = { path = "../rlwindows" }
 widestring = "0.4"
+winapi     = { version = "0.3", features = [ "consoleapi", "debugapi", "impl-default" ] }

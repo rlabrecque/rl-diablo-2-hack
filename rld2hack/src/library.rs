@@ -1,3 +1,4 @@
+#[derive(Clone)]
 pub struct Library {
     pub name: String,
     pub handle: winapi::shared::minwindef::HMODULE,

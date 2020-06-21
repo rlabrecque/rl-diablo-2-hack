@@ -1,4 +1,7 @@
+use super::d2core::D2Core;
 use crate::library::Library;
+
+use detour::GenericDetour;
 
 /*
 FUNCPTR(D2CLIENT, GetQuestInfo, void* __stdcall, (void), 0xB32D0) // Updated 1.14d //004B32D0-BASE
@@ -103,14 +106,6 @@ FUNCPTR(D2CLIENT, CancelTrade, void __fastcall, (void), 0xB90B0) // Updated 1.14
 FUNCPTR(D2CLIENT, TradeOK, void __stdcall, (void), 0xB8A30)      // Updated 1.14d //004B8A30-BASE
 */
 
-pub fn exit_game(game: &Library) {
-    type ExitGameFn = extern "fastcall" fn();
-
-    unsafe {
-        std::mem::transmute::<usize, ExitGameFn>(game.fix_offset(0x4DD60usize))();
-    }
-}
-
 pub fn get_difficulty(game: &Library) -> u8 {
     type GetDifficultyFn = extern "stdcall" fn() -> u8;
 
@@ -140,4 +135,26 @@ pub fn get_game_language_code(game: &Library) -> u32 {
     type GetGameLanguageCodeFn = extern "fastcall" fn() -> u32;
 
     unsafe { std::mem::transmute::<usize, GetGameLanguageCodeFn>(game.fix_offset(0x125150usize))() }
+}
+
+pub type ExitGameFn = extern "fastcall" fn();
+
+pub fn create_hook_exit_game(game: &Library) -> GenericDetour<ExitGameFn> {
+    unsafe {
+        let exit_game_fn: ExitGameFn = std::mem::transmute(game.fix_offset(0x4DD60));
+
+        let hook = GenericDetour::<ExitGameFn>::new(exit_game_fn, exit_game_hook).unwrap();
+        hook.enable().unwrap();
+        hook
+    }
+}
+
+extern "fastcall" fn exit_game_hook() {
+    println!("exit_game_hook");
+
+    //ExitGameDetour.call();
+}
+
+pub fn exit_game(d2core: &D2Core) {
+    d2core.hook.call();
 }
