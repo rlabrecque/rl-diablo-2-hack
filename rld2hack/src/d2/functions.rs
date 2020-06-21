@@ -143,18 +143,18 @@ pub fn create_hook_exit_game(game: &Library) -> GenericDetour<ExitGameFn> {
     unsafe {
         let exit_game_fn: ExitGameFn = std::mem::transmute(game.fix_offset(0x4DD60));
 
-        let hook = GenericDetour::<ExitGameFn>::new(exit_game_fn, exit_game_hook).unwrap();
-        hook.enable().unwrap();
-        hook
+        let exit_game_detour = GenericDetour::<ExitGameFn>::new(exit_game_fn, exit_game_hook).unwrap();
+        exit_game_detour.enable().unwrap();
+        exit_game_detour
     }
 }
 
 extern "fastcall" fn exit_game_hook() {
     println!("exit_game_hook");
 
-    //ExitGameDetour.call();
+    exit_game(D2Core::get());
 }
 
 pub fn exit_game(d2core: &D2Core) {
-    d2core.hook.call();
+    d2core.exit_game_detour.call();
 }
