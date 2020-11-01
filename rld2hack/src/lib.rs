@@ -27,9 +27,9 @@ fn dll_attach(base: winapi::shared::minwindef::LPVOID) {
     let game = Library::new("Game.exe".to_owned());
     let d2core = D2Core::new(game.clone());
 
-    for _ in 0..15 {
+    for _ in 0..150 {
         print_dbg("");
-        print_dbg(&format!(
+        /*print_dbg(&format!(
             "ScreenSize: {}x{}",
             d2::variables::get_screensize_x(&game),
             d2::variables::get_screensize_y(&game)
@@ -130,7 +130,7 @@ fn dll_attach(base: winapi::shared::minwindef::LPVOID) {
             d2::functions::get_mouse_x_offset(&game),
             d2::functions::get_mouse_y_offset(&game)
         ));
-        d2::functions::print_game_string(&d2core, "I love you", 0);
+        d2::functions::print_game_string(&d2core, "I love you", 0);*/
         //d2::functions::print_party_string(&game, "Spam", 1);
 
         //d2::functions::close_npc_interact(&game);

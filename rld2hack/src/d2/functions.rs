@@ -105,6 +105,29 @@ pub fn print_game_string(d2core: &D2Core, message: &str, color: i32) {
     }
 }
 
+pub type ChatPacketRecvFn = extern "fastcall" fn(packet: i8) -> i32;
+
+pub fn create_hook_chat_packet_recv(game: &Library) -> GenericDetour<ChatPacketRecvFn> {
+    unsafe {
+        let chat_packet_recv_fn: ChatPacketRecvFn = std::mem::transmute(game.fix_offset(0x121B00));
+
+        let chat_packet_recv_detour =
+            GenericDetour::<ChatPacketRecvFn>::new(chat_packet_recv_fn, chat_packet_recv_hook).unwrap();
+        chat_packet_recv_detour.enable().unwrap();
+        chat_packet_recv_detour
+    }
+}
+
+extern "fastcall" fn chat_packet_recv_hook(packet: i8) -> i32 {
+    println!("1 chat_packet_recv_hook: {}", packet);
+
+    let result = D2Core::get().chat_packet_recv_detour.call(packet);
+
+    println!("2 test {}", result);
+
+    result
+}
+
 pub fn print_party_string(game: &Library, message: &str, color: i32) {
     type PrintPartyStringFn = extern "fastcall" fn(message: *const u16, color: i32);
 
