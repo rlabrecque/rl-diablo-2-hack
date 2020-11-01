@@ -4,36 +4,39 @@ on: [push, pull_request]
 jobs:
   check:
     name: cargo check
-    runs-on: ubuntu-latest
+    runs-on: windows-2019
     steps:
       - uses: actions/checkout@v1
       - uses: actions-rs/toolchain@v1
         with:
-          toolchain: stable
+          toolchain: nightly
+          target: i686-pc-windows-msvc
           override: true
       - uses: actions-rs/cargo@v1
         with:
           command: check
   test:
     name: cargo test
-    runs-on: ubuntu-latest
+    runs-on: windows-2019
     steps:
       - uses: actions/checkout@v1
       - uses: actions-rs/toolchain@v1
         with:
-          toolchain: stable
+          toolchain: nightly
+          target: i686-pc-windows-msvc
           override: true
       - uses: actions-rs/cargo@v1
         with:
           command: test
   fmt:
     name: cargo fmt
-    runs-on: ubuntu-latest
+    runs-on: windows-2019
     steps:
       - uses: actions/checkout@v1
       - uses: actions-rs/toolchain@v1
         with:
-          toolchain: stable
+          toolchain: nightly
+          target: i686-pc-windows-msvc
           override: true
       - run: rustup component add rustfmt
       - uses: actions-rs/cargo@v1
@@ -42,20 +45,16 @@ jobs:
           args: --all -- --check
   clippy:
     name: cargo clippy
-    runs-on: ubuntu-latest
+    runs-on: windows-2019
     steps:
       - uses: actions/checkout@v1
       - uses: actions-rs/toolchain@v1
         with:
-          toolchain: stable
+          toolchain: nightly
+          target: i686-pc-windows-msvc
           override: true
       - run: rustup component add clippy
       - uses: actions-rs/cargo@v1
         with:
           command: clippy
           args: -- -D warnings
-  cargo-deny:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v1
-    - uses: EmbarkStudios/cargo-deny-action@v0

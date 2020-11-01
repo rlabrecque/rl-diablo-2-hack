@@ -8,11 +8,12 @@ It's completely Rust based 🦀.
 
 It's split into 3 packages:
 
-- *rld2hack* a DLL library that provides memory viewing, function execution, and function hooking.
-- *rlinjector* a simple DLL injector application to inject rld2hack.dll into Diablo 2's Game.exe.
-- *rlwindows* a hacky library wrapper around Win32 API calls.
+- **rld2hack** a DLL library that provides memory viewing, function execution, and function hooking.
+- **rlinjector** a simple DLL injector application to inject rld2hack.dll into Diablo 2's Game.exe.
+- **rlwindows** a hacky library wrapper around Win32 API calls.
 
-Note this project supports Windows only. Currently supports Diablo 2 LOD patch 1.14d.
+Note this project supports Windows only using the nightly-i686-pc-windows-msvc toolchain/target due to the detour library.
+Currently supports Diablo 2 LOD patch 1.14d.
 
 ## Building
 
@@ -34,7 +35,7 @@ After building run the following from the project root:
 
 Licensed under either of
 
-* Apache License, Version 2.0 ([LICENSE-APACHE](LICENSE-APACHE) or http://www.apache.org/licenses/LICENSE-2.0)
-* MIT license ([LICENSE-MIT](LICENSE-MIT) or http://opensource.org/licenses/MIT)
+- Apache License, Version 2.0 ([LICENSE-APACHE](LICENSE-APACHE) or http://www.apache.org/licenses/LICENSE-2.0)
+- MIT license ([LICENSE-MIT](LICENSE-MIT) or http://opensource.org/licenses/MIT)
 
 at your option.
