@@ -12,6 +12,7 @@ jobs:
           toolchain: nightly
           target: i686-pc-windows-msvc
           override: true
+          default: true
       - uses: actions-rs/cargo@v1
         with:
           command: check
@@ -25,6 +26,7 @@ jobs:
           toolchain: nightly
           target: i686-pc-windows-msvc
           override: true
+          default: true
       - uses: actions-rs/cargo@v1
         with:
           command: test
@@ -38,6 +40,7 @@ jobs:
           toolchain: nightly
           target: i686-pc-windows-msvc
           override: true
+          default: true
       - run: rustup component add rustfmt
       - uses: actions-rs/cargo@v1
         with:
@@ -53,6 +56,7 @@ jobs:
           toolchain: nightly
           target: i686-pc-windows-msvc
           override: true
+          default: true
       - run: rustup component add clippy
       - uses: actions-rs/cargo@v1
         with:
