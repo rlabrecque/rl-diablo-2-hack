@@ -29,7 +29,7 @@ pub fn get_process_ids_from_name(process_name: &str) -> Vec<u32> {
             let filename: WideCString = WideCString::from_str_with_nul(filename).unwrap();
             let filename: String = filename.to_string_lossy();
 
-            println!("Process name: {:#?}", filename);
+            //println!("Process name: {:#?}", filename);
             if filename == *process_name {
                 process_ids.push(process_entry.th32ProcessID);
             }

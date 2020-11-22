@@ -2,7 +2,7 @@ mod winutils;
 
 #[cfg(target_arch = "x86")]
 pub fn inject(dll_path: &std::path::PathBuf, process_name: &str) -> Result<(), Box<dyn std::error::Error>> {
-    println!("Inject {:#?} {}", dll_path, process_name);
+    println!("Inject {} {}", dll_path.display(), process_name);
     println!(
         "Are we elevated: {}",
         winutils::is_process_elevated(rlwindows::get_current_process())
@@ -20,7 +20,7 @@ pub fn inject(dll_path: &std::path::PathBuf, process_name: &str) -> Result<(), B
     }
 
     for process_id in &process_ids {
-        println!("{}", process_id);
+        //println!("{}", process_id);
 
         let process_handle: winapi::um::winnt::HANDLE = rlwindows::open_process(
             *process_id,
