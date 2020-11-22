@@ -8,11 +8,11 @@
             "name": "Debug rlinjector",
             "type": "cppvsdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/target/debug/rlinjector.exe",
-            "args": ["${workspaceFolder}/target/debug/rld2hack.dll", "-p", "Game.exe"],
+            "program": "${workspaceFolder}/target/i686-pc-windows-msvc/debug/rlinjector.exe",
+            "args": ["${workspaceFolder}/target/i686-pc-windows-msvc/debug/rld2hack.dll", "-p", "Game.exe"],
             "stopAtEntry": false,
             "externalConsole": false,
-            "cwd": "${workspaceFolder}/target/debug",
+            "cwd": "${workspaceFolder}/target/i686-pc-windows-msvc/debug/",
             "preLaunchTask": "rust: cargo build",
             "sourceFileMap": {
                 "/rustc/118b50524b79e565f017e08bce9b90a16c63634f": "${env:HOME}${env:USERPROFILE}\\.rustup\\toolchains\\stable-i686-pc-windows-msvc\\lib\\rustlib\\src\\rust"

@@ -7,17 +7,15 @@
 			"problemMatcher": [
 				"$rustc"
 			],
+			"presentation": {
+				"reveal": "always",
+				"revealProblems": "never",
+				"showReuseMessage": false,
+				"panel": "dedicated",
+				"clear": true
+			},
 			"group": "build",
 			"label": "rust: cargo build"
-		},
-		{
-			"type": "cargo",
-			"command": "check",
-			"problemMatcher": [
-				"$rustc"
-			],
-			"group": "build",
-			"label": "rust: cargo check"
 		}
 	]
 }
