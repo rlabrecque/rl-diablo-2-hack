@@ -4,8 +4,8 @@ compile_error!("This only works on Windows.");
 #[cfg(not(target_arch = "x86"))]
 compile_error!("This only works on 32bit.");
 
-mod d2;
-mod library;
+pub mod d2;
+pub mod library;
 
 use d2::d2core::D2Core;
 use library::Library;
