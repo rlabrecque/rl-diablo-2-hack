@@ -257,13 +257,12 @@ pub fn inject_library(process_handle: winapi::um::winnt::HANDLE, dll_path: &std:
     }
 
     rlwindows::close_handle(thread_handle);
-    rlwindows::close_handle(process_handle);
-    /*rlwindows::virtual_free_ex(
+    rlwindows::virtual_free_ex(
         process_handle,
         remote_string,
         dll_path_size,
         winapi::um::winnt::MEM_RELEASE,
-    );*/
+    );
 
     return true;
 }
