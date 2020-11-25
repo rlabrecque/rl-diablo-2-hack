@@ -11,10 +11,8 @@ use d2::d2core::D2Core;
 use library::Library;
 
 pub fn print_dbg(msg: &str) {
-    let msg_cstring = std::ffi::CString::new(msg).unwrap();
-    unsafe {
-        winapi::um::debugapi::OutputDebugStringA(msg_cstring.as_ptr());
-    }
+    let msg_cstring = widestring::WideCString::from_str(msg).unwrap();
+    rlwindows::output_debug_string(msg_cstring.as_ptr());
     println!("{}", msg);
 }
 

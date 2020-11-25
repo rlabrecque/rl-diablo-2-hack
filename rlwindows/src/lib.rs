@@ -258,3 +258,9 @@ pub fn free_library_and_exit_thread(
         winapi::um::libloaderapi::FreeLibraryAndExitThread(module_handle, exit_code);
     }
 }
+
+pub fn output_debug_string(output_string: winapi::shared::ntdef::LPCWSTR) {
+    unsafe {
+        winapi::um::debugapi::OutputDebugStringW(output_string);
+    }
+}
