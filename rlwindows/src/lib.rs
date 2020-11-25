@@ -201,6 +201,38 @@ pub fn open_process_token(
     }
 }
 
+pub fn lookup_privilege_value(
+    system_name: winapi::shared::ntdef::LPCWSTR,
+    name: winapi::shared::ntdef::LPCWSTR,
+    luid: winapi::um::winnt::PLUID,
+) -> bool {
+    unsafe {
+        let ret = winapi::um::winbase::LookupPrivilegeValueW(system_name, name, luid);
+        return ret == winapi::shared::minwindef::TRUE;
+    }
+}
+
+pub fn adjust_token_privileges(
+    token_handle: winapi::um::winnt::HANDLE,
+    disable_all_privileges: winapi::shared::minwindef::BOOL,
+    new_state: winapi::um::winnt::PTOKEN_PRIVILEGES,
+    buffer_length: winapi::shared::minwindef::DWORD,
+    previous_state: winapi::um::winnt::PTOKEN_PRIVILEGES,
+    return_length: winapi::shared::minwindef::PDWORD,
+) -> bool {
+    unsafe {
+        let ret = winapi::um::securitybaseapi::AdjustTokenPrivileges(
+            token_handle,
+            disable_all_privileges,
+            new_state,
+            buffer_length,
+            previous_state,
+            return_length,
+        );
+        return ret == winapi::shared::minwindef::TRUE;
+    }
+}
+
 pub fn get_current_process() -> winapi::um::winnt::HANDLE {
     unsafe { winapi::um::processthreadsapi::GetCurrentProcess() }
 }

@@ -67,6 +67,46 @@ pub fn is_process_elevated(process_handle: winapi::um::winnt::HANDLE) -> bool {
     return is_elevated;
 }
 
+pub fn enable_debug_privilege() -> bool {
+    let mut token_handle: winapi::um::winnt::HANDLE = std::ptr::null_mut();
+    let mut se_debugname_value = winapi::um::winnt::LUID::default();
+    let mut token_privileges = winapi::um::winnt::TOKEN_PRIVILEGES::default();
+
+    if rlwindows::open_process_token(
+        rlwindows::get_current_process(),
+        winapi::um::winnt::TOKEN_ADJUST_PRIVILEGES | winapi::um::winnt::TOKEN_QUERY,
+        &mut token_handle,
+    ) {
+        if rlwindows::lookup_privilege_value(
+            std::ptr::null(),
+            widestring::WideCString::from_str(winapi::um::winnt::SE_DEBUG_NAME)
+                .unwrap()
+                .into_raw(),
+            &mut se_debugname_value,
+        ) {
+            token_privileges.PrivilegeCount = 1;
+            token_privileges.Privileges[0].Luid = se_debugname_value;
+            token_privileges.Privileges[0].Attributes = winapi::um::winnt::SE_PRIVILEGE_ENABLED;
+
+            if rlwindows::adjust_token_privileges(
+                token_handle,
+                winapi::shared::minwindef::FALSE,
+                &mut token_privileges,
+                std::mem::size_of::<winapi::um::winnt::TOKEN_PRIVILEGES>() as u32,
+                std::ptr::null_mut(),
+                std::ptr::null_mut(),
+            ) {
+                rlwindows::close_handle(token_handle);
+                return true;
+            }
+        }
+    }
+
+    rlwindows::close_handle(token_handle);
+
+    return false;
+}
+
 pub fn find_remote_module_by_path(process_id: u32, dll_path: &std::path::Path) -> winapi::shared::minwindef::HMODULE {
     use std::os::windows::ffi::OsStringExt;
 

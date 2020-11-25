@@ -8,6 +8,11 @@ pub fn inject(dll_path: &std::path::PathBuf, process_name: &str) -> Result<(), B
         winutils::is_process_elevated(rlwindows::get_current_process())
     );
 
+    if !winutils::enable_debug_privilege() {
+        let err_msg = format!("enable_debug_privilege failed.");
+        return Err(err_msg.into());
+    }
+
     if !dll_path.exists() {
         let err_msg = format!("DLL file specified does not exist: {:#?}", dll_path);
         return Err(err_msg.into());
