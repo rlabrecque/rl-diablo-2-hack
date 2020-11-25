@@ -1,7 +1,5 @@
 pub fn get_process_ids_from_name(process_name: &str) -> Vec<u32> {
-    use std::ffi::OsString;
     use std::os::windows::ffi::OsStringExt;
-    use widestring::WideCString;
 
     let mut process_entry = winapi::um::tlhelp32::PROCESSENTRY32W {
         dwSize: std::mem::size_of::<winapi::um::tlhelp32::PROCESSENTRY32W>() as u32,
@@ -24,9 +22,9 @@ pub fn get_process_ids_from_name(process_name: &str) -> Vec<u32> {
     if rlwindows::process32_first(snapshot, &mut process_entry) {
         // TODO: Bug where we skip this first process??
         while rlwindows::process32_next(snapshot, &mut process_entry) {
-            let filename: OsString = OsString::from_wide(&process_entry.szExeFile);
+            let filename: std::ffi::OsString = std::ffi::OsString::from_wide(&process_entry.szExeFile);
             let filename: &str = filename.to_str().unwrap();
-            let filename: WideCString = WideCString::from_str_with_nul(filename).unwrap();
+            let filename: widestring::WideCString = widestring::WideCString::from_str_with_nul(filename).unwrap();
             let filename: String = filename.to_string_lossy();
 
             //println!("Process name: {:#?}", filename);
@@ -70,9 +68,7 @@ pub fn is_process_elevated(process_handle: winapi::um::winnt::HANDLE) -> bool {
 }
 
 pub fn find_remote_module_by_path(process_id: u32, dll_path: &std::path::Path) -> winapi::shared::minwindef::HMODULE {
-    use std::ffi::OsString;
     use std::os::windows::ffi::OsStringExt;
-    use widestring::WideCString;
 
     let mut module_entry = winapi::um::tlhelp32::MODULEENTRY32W {
         dwSize: std::mem::size_of::<winapi::um::tlhelp32::MODULEENTRY32W>() as u32,
@@ -94,9 +90,9 @@ pub fn find_remote_module_by_path(process_id: u32, dll_path: &std::path::Path) -
     if rlwindows::module32_first(snapshot, &mut module_entry) {
         // TODO: Bug where we skip this first module??
         while rlwindows::module32_next(snapshot, &mut module_entry) {
-            let filename: OsString = OsString::from_wide(&module_entry.szExePath);
+            let filename: std::ffi::OsString = std::ffi::OsString::from_wide(&module_entry.szExePath);
             let filename: &str = filename.to_str().unwrap();
-            let filename: WideCString = WideCString::from_str_with_nul(filename).unwrap();
+            let filename: widestring::WideCString = widestring::WideCString::from_str_with_nul(filename).unwrap();
             let filename: String = filename.to_string_lossy();
             let filename: std::path::PathBuf = std::path::PathBuf::from(filename);
 
@@ -116,9 +112,7 @@ pub fn find_remote_module_by_path(process_id: u32, dll_path: &std::path::Path) -
 }
 
 pub fn inject_library(process_handle: winapi::um::winnt::HANDLE, dll_path: &std::path::Path) -> bool {
-    use std::ffi::CString;
     use std::os::windows::ffi::OsStrExt;
-    use widestring::WideCString;
 
     if process_handle == std::ptr::null_mut() {
         println!("Process does not exist or is not accessible.");
@@ -126,7 +120,7 @@ pub fn inject_library(process_handle: winapi::um::winnt::HANDLE, dll_path: &std:
     }
 
     let kernel32_str = "Kernel32.dll";
-    let kernel32_wide_str = WideCString::from_str(kernel32_str).unwrap();
+    let kernel32_wide_str = widestring::WideCString::from_str(kernel32_str).unwrap();
     let kernel32_module = rlwindows::get_module_handle(kernel32_wide_str.as_ptr());
     if kernel32_module == std::ptr::null_mut() {
         println!("Failed to find {}.", kernel32_str);
@@ -134,7 +128,7 @@ pub fn inject_library(process_handle: winapi::um::winnt::HANDLE, dll_path: &std:
     }
 
     let load_library_str = "LoadLibraryW";
-    let load_library_cstring = CString::new(load_library_str).unwrap();
+    let load_library_cstring = std::ffi::CString::new(load_library_str).unwrap();
     let load_library_address = rlwindows::get_proc_address(kernel32_module, load_library_cstring.as_ptr());
     if load_library_address == std::ptr::null_mut() {
         println!("Failed to find {}.", load_library_str);

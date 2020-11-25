@@ -6,13 +6,12 @@ pub struct Library {
 
 impl Library {
     pub fn new(name: String) -> Self {
-        use widestring::WideCString;
-
-        let file_name: WideCString = WideCString::from_str(&name).unwrap();
+        let file_name: widestring::WideCString = widestring::WideCString::from_str(&name).unwrap();
         let process_handle = rlwindows::load_library(file_name.as_ptr());
         if process_handle.is_null() {
             super::print_dbg(&format!("Failed to load library: {}", name));
         }
+
         super::print_dbg(&format!("{} successfully loaded at offset {:?}", name, process_handle));
 
         Library {

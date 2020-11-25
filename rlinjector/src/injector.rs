@@ -20,8 +20,6 @@ pub fn inject(dll_path: &std::path::PathBuf, process_name: &str) -> Result<(), B
     }
 
     for process_id in &process_ids {
-        //println!("{}", process_id);
-
         let process_handle: winapi::um::winnt::HANDLE = rlwindows::open_process(
             *process_id,
             winapi::um::winnt::PROCESS_CREATE_THREAD
@@ -33,7 +31,7 @@ pub fn inject(dll_path: &std::path::PathBuf, process_name: &str) -> Result<(), B
 
         if process_handle == std::ptr::null_mut() {
             rlwindows::print_get_last_err();
-            println!("Process with id {:?} does not exist or is not accessible.", process_id);
+            println!("Process id '{}' does not exist or is not accessible.", process_id);
             continue;
         }
 
