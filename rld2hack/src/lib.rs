@@ -10,15 +10,14 @@ pub mod library;
 use d2::d2core::D2Core;
 use library::Library;
 
+static THREAD_RUNNING: std::sync::atomic::AtomicBool = std::sync::atomic::AtomicBool::new(true);
+static mut THREAD_HANDLE: winapi::um::winnt::HANDLE = std::ptr::null_mut();
 
 fn dll_attach(base: winapi::shared::minwindef::LPVOID) {
     println!("Attach!");
 
 
-    let game = Library::new("Game.exe".to_owned());
-    let d2core = D2Core::new(game.clone());
-
-    for _ in 0..15 {
+    while THREAD_RUNNING.load(std::sync::atomic::Ordering::Relaxed) {
         println!("");
         println!(
             "ScreenSize: {}x{}",
@@ -143,10 +142,11 @@ unsafe extern "system" fn dll_attach_wrapper(
         Ok(_) => {}
     }
 
-    rlwindows::free_library_and_exit_thread(base as _, 1);
+    println!("Post attach!");
 
-    // This won't be executed because the
-    unreachable!()
+    rlwindows::free_library_and_exit_thread(base as _, 0);
+
+    1
 }
 
 #[no_mangle]
@@ -154,26 +154,38 @@ unsafe extern "system" fn dll_attach_wrapper(
 pub extern "system" fn DllMain(
     hinst_dll: winapi::shared::minwindef::HINSTANCE,
     fdw_reason: winapi::shared::minwindef::DWORD,
-    _lpv_reserved: winapi::shared::minwindef::LPVOID,
+    lpv_reserved: winapi::shared::minwindef::LPVOID,
 ) -> winapi::shared::minwindef::BOOL {
-
     match fdw_reason {
         winapi::um::winnt::DLL_PROCESS_ATTACH => {
-            let mut thread_id: winapi::shared::minwindef::DWORD = 0;
-            let thread_id_ptr: *mut winapi::shared::minwindef::DWORD =
-                &mut thread_id as *mut _ as *mut winapi::shared::minwindef::DWORD;
+            println!("DllMain: DLL_PROCESS_ATTACH {:?}", hinst_dll);
 
-            rlwindows::create_thread(
+            rlwindows::disable_thread_library_calls(hinst_dll as _);
+
+            let mut thread_id = winapi::shared::minwindef::DWORD::default();
+
+            unsafe {
+                THREAD_HANDLE = rlwindows::create_thread(
                 std::ptr::null_mut(),
                 0,
                 Some(dll_attach_wrapper),
                 hinst_dll as _,
                 0,
-                thread_id_ptr,
-            );
-        }
+                &mut thread_id);
             }
-        _ => {}
+        }
+        winapi::um::winnt::DLL_THREAD_ATTACH => {
+            println!("DllMain: DLL_THREAD_ATTACH {:?}", hinst_dll);
+        }
+        winapi::um::winnt::DLL_THREAD_DETACH => {
+            println!("DllMain: DLL_THREAD_DETACH {:?}", hinst_dll);
+        }
+        winapi::um::winnt::DLL_PROCESS_DETACH => {
+            println!("DllMain: DLL_PROCESS_DETACH {:?}", hinst_dll);
+        }
+        reason => {
+            println!("DllMain: Unexpected reason! {}", reason);
+        }
     }
 
     return winapi::shared::minwindef::TRUE;
@@ -183,6 +195,8 @@ pub extern "system" fn DllMain(
 #[allow(non_snake_case)]
 pub extern "system" fn UnloadModule(_base: winapi::shared::minwindef::LPVOID) -> winapi::shared::minwindef::DWORD {
     println!("UnloadModule");
+
+    THREAD_RUNNING.store(false, std::sync::atomic::Ordering::Relaxed);
 
     return winapi::shared::minwindef::TRUE as _;
 }
