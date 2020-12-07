@@ -10,120 +10,113 @@ pub mod library;
 use d2::d2core::D2Core;
 use library::Library;
 
-pub fn print_dbg(msg: &str) {
-    let msg_cstring = widestring::WideCString::from_str(msg).unwrap();
-    rlwindows::output_debug_string(msg_cstring.as_ptr());
-    println!("{}", msg);
-}
 
 fn dll_attach(base: winapi::shared::minwindef::LPVOID) {
-    rlwindows::alloc_console();
-    rlwindows::disable_thread_library_calls(base as _);
+    println!("Attach!");
 
-    print_dbg("Attach!");
 
     let game = Library::new("Game.exe".to_owned());
     let d2core = D2Core::new(game.clone());
 
     for _ in 0..15 {
-        print_dbg("");
-        print_dbg(&format!(
+        println!("");
+        println!(
             "ScreenSize: {}x{}",
             d2::variables::get_screensize_x(&game),
             d2::variables::get_screensize_y(&game)
         ));
-        print_dbg(&format!(
+        println!(
             "Cursor Hover: ({}, {})",
             d2::variables::get_cursor_hover_x(&game),
             d2::variables::get_cursor_hover_y(&game)
         ));
-        print_dbg(&format!(
+        println!(
             "Mouse Pos: ({}, {})",
             d2::variables::get_mouse_pos_x(&game),
             d2::variables::get_mouse_pos_y(&game)
         ));
-        print_dbg(&format!(
+        println!(
             "Mouse Offset: ({}, {}, {})",
             d2::variables::get_mouse_offset_y(&game),
             d2::variables::get_mouse_offset_z(&game),
             d2::variables::get_mouse_offset_x(&game)
         ));
-        print_dbg(&format!(
+        println!(
             "Automap: On: {} Mode: {} Offset: {}",
             d2::variables::get_automap_on(&game),
             d2::variables::get_automap_mode(&game),
             d2::variables::get_automap_offset(&game)
         ));
-        print_dbg(&format!(
+        println!(
             "Viewport: ({}, {})",
             d2::variables::get_viewport_x(&game),
             d2::variables::get_viewport_y(&game)
         ));
-        print_dbg(&format!(
+        println!(
             "Gold Dialog: Action: {} Amount: {}",
             d2::variables::get_gold_dialog_action(&game),
             d2::variables::get_gold_dialog_amount(&game)
         ));
-        print_dbg(&format!(
+        println!(
             "NPC Menu Amount: {}",
             d2::variables::get_npc_menu_amount(&game)
         ));
-        print_dbg(&format!(
+        println!(
             "Regular Cursor Type: {}",
             d2::variables::get_regular_cursor_type(&game)
         ));
-        print_dbg(&format!(
+        println!(
             "Shop Cursor Type: {}",
             d2::variables::get_shop_cursor_type(&game)
         ));
-        print_dbg(&format!("FPS: {}", d2::variables::get_fps(&game)));
-        print_dbg(&format!("Skip: {}", d2::variables::get_skip(&game)));
-        print_dbg(&format!("Ping: {}", d2::variables::get_ping(&game)));
-        print_dbg(&format!("Lang: {}", d2::variables::get_lang(&game)));
-        print_dbg(&format!("Divisor: {}", d2::variables::get_divisor(&game)));
-        print_dbg(&format!(
+        println!("FPS: {}", d2::variables::get_fps(&game)));
+        println!("Skip: {}", d2::variables::get_skip(&game)));
+        println!("Ping: {}", d2::variables::get_ping(&game)));
+        println!("Lang: {}", d2::variables::get_lang(&game)));
+        println!("Divisor: {}", d2::variables::get_divisor(&game)));
+        println!(
             "Overhead Trigger: {}",
             d2::variables::get_overhead_trigger(&game)
         ));
-        print_dbg(&format!(
+        println!(
             "Recent Interact Id: {}",
             d2::variables::get_recent_interact_id(&game)
         ));
-        print_dbg(&format!(
+        println!(
             "Item Price List: {}",
             d2::variables::get_item_price_list(&game)
         ));
-        print_dbg(&format!("Waypoint Table: {}", d2::variables::get_waypoint_table(&game)));
-        print_dbg(&format!(
+        println!("Waypoint Table: {}", d2::variables::get_waypoint_table(&game)));
+        println!(
             "Is Weapon Swapped: {}",
             d2::variables::get_is_weapon_swapped(&game)
         ));
-        print_dbg(&format!(
+        println!(
             "Trade: Accepted: {} Blocked: {} Recent Trade Id: {}",
             d2::variables::get_is_trade_accepted(&game),
             d2::variables::get_is_trade_block(&game),
             d2::variables::get_recent_trade_id(&game)
         ));
-        print_dbg(&format!("Exp Char Flag: {}", d2::variables::get_exp_char_flag(&game)));
-        print_dbg(&format!("Map Id: {}", d2::variables::get_map_id(&game)));
-        print_dbg(&format!("Always Run: {}", d2::variables::get_always_run(&game)));
-        print_dbg(&format!("No Pickup: {}", d2::variables::get_no_pickup(&game)));
-        print_dbg(&format!("Chat Message: {}", d2::variables::get_chat_message(&game)));
-        print_dbg(&format!("Orfice Id: {}", d2::variables::get_orifice_id(&game)));
-        print_dbg(&format!(
+        println!("Exp Char Flag: {}", d2::variables::get_exp_char_flag(&game)));
+        println!("Map Id: {}", d2::variables::get_map_id(&game)));
+        println!("Always Run: {}", d2::variables::get_always_run(&game)));
+        println!("No Pickup: {}", d2::variables::get_no_pickup(&game)));
+        println!("Chat Message: {}", d2::variables::get_chat_message(&game)));
+        println!("Orfice Id: {}", d2::variables::get_orifice_id(&game)));
+        println!(
             "Cursor Item Mode: {}",
             d2::variables::get_cursor_item_mode(&game)
         ));
 
-        print_dbg("");
+        println!("");
 
-        print_dbg(&format!("Automap Size: {}", d2::functions::get_automap_size(&game)));
-        print_dbg(&format!("Difficulty: {}", d2::functions::get_difficulty(&game)));
-        print_dbg(&format!(
+        println!("Automap Size: {}", d2::functions::get_automap_size(&game)));
+        println!("Difficulty: {}", d2::functions::get_difficulty(&game)));
+        println!(
             "Game Language Code: {}",
             d2::functions::get_game_language_code(&game)
         ));
-        print_dbg(&format!(
+        println!(
             "Mouse Offset: ({}, {})",
             d2::functions::get_mouse_x_offset(&game),
             d2::functions::get_mouse_y_offset(&game)
@@ -135,12 +128,9 @@ fn dll_attach(base: winapi::shared::minwindef::LPVOID) {
         //d2::functions::close_interact(&game);
         //d2::functions::exit_game(&d2core);
 
-        std::thread::sleep(std::time::Duration::from_millis(1000));
+        println!("Running!");
+        std::thread::sleep(std::time::Duration::from_millis(500));
     }
-}
-
-fn dll_detach() {
-    print_dbg("Detatch!");
 }
 
 unsafe extern "system" fn dll_attach_wrapper(
@@ -148,7 +138,7 @@ unsafe extern "system" fn dll_attach_wrapper(
 ) -> winapi::shared::minwindef::DWORD {
     match std::panic::catch_unwind(|| dll_attach(base)) {
         Err(e) => {
-            print_dbg(&format!("`dll_attach` has panicked: {:#?}", e));
+            println!("`dll_attach` has panicked: {:#?}", e);
         }
         Ok(_) => {}
     }
@@ -166,7 +156,6 @@ pub extern "system" fn DllMain(
     fdw_reason: winapi::shared::minwindef::DWORD,
     _lpv_reserved: winapi::shared::minwindef::LPVOID,
 ) -> winapi::shared::minwindef::BOOL {
-    print_dbg(&format!("DllMain: {}", fdw_reason));
 
     match fdw_reason {
         winapi::um::winnt::DLL_PROCESS_ATTACH => {
@@ -183,12 +172,7 @@ pub extern "system" fn DllMain(
                 thread_id_ptr,
             );
         }
-        winapi::um::winnt::DLL_PROCESS_DETACH => match std::panic::catch_unwind(|| dll_detach()) {
-            Err(e) => {
-                print_dbg(&format!("`dll_detach` has panicked: {:#?}", e));
             }
-            Ok(_) => {}
-        },
         _ => {}
     }
 

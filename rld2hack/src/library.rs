@@ -9,10 +9,10 @@ impl Library {
         let file_name: widestring::WideCString = widestring::WideCString::from_str(&name).unwrap();
         let process_handle = rlwindows::load_library(file_name.as_ptr());
         if process_handle.is_null() {
-            super::print_dbg(&format!("Failed to load library: {}", name));
+            println!("Failed to load library: {}", name);
         }
 
-        super::print_dbg(&format!("{} successfully loaded at offset {:?}", name, process_handle));
+        println!("{} successfully loaded at offset {:?}", name, process_handle);
 
         Library {
             name: name,
