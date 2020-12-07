@@ -177,3 +177,33 @@ extern "fastcall" fn exit_game_hook() {
 pub fn exit_game(d2core: &D2Core) {
     d2core.exit_game_detour.call();
 }
+
+
+/*
+    {PatchCall, GetDllOffset("D2Client.dll", 0x5F802), (DWORD)GamePacketReceived_Intercept, 5}, // Updated 1.14d //0045F802-BASE
+    {PatchJmp, GetDllOffset("D2Client.dll", 0x12AE5A), (DWORD)GamePacketSent_Interception, 5},  // Updated 1.14d //0052AE5A-BASE
+*/
+
+pub type GamePacketReceivedFn = extern "fastcall" fn(packet: *const u8, size: i32) -> i32;
+
+pub fn create_hook_game_packet_received(game: &Library) -> GenericDetour<GamePacketReceivedFn> {
+    unsafe {
+        let game_packet_received_fn: GamePacketReceivedFn = std::mem::transmute(game.fix_offset(0x12AEB0));
+
+        let hook_game_packet_received_detour =
+            GenericDetour::<GamePacketReceivedFn>::new(game_packet_received_fn, game_packet_received_hook).unwrap();
+        hook_game_packet_received_detour.enable().unwrap();
+        hook_game_packet_received_detour
+    }
+}
+
+extern "fastcall" fn game_packet_received_hook(packet: *const u8, size: i32) -> i32 {
+    let packet_type = unsafe { *packet.offset(0) };
+    println!("game_packet_received_hook: Packet Address: {:?} Packet: 0x{:x} Size: {}", packet, packet_type, size);
+
+    D2Core::get().game_packet_received_detour.call(packet, size)
+}
+
+pub fn game_packet_received(d2core: &D2Core, packet: *const u8, size: i32) -> i32 {
+    d2core.game_packet_received_detour.call(packet, size)
+}
