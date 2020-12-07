@@ -5,18 +5,35 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Debug rlinjector",
+            "name": "rlinjector",
             "type": "cppvsdbg",
             "request": "launch",
             "program": "${workspaceFolder}/target/i686-pc-windows-msvc/debug/rlinjector.exe",
-            "args": ["${workspaceFolder}/target/i686-pc-windows-msvc/debug/rld2hack.dll", "-p", "Game.exe"],
+            "args": ["inject", "${workspaceFolder}/target/i686-pc-windows-msvc/debug/rld2hack.dll", "-p", "Game.exe"],
+            "stopAtEntry": false,
+            "externalConsole": false,
+            "preLaunchTask": "rust: cargo build",
+            "cwd": "${workspaceFolder}/target/i686-pc-windows-msvc/debug/",
+            "sourceFileMap": {
+                "/rustc/593fe977a77ad5a7aec23c6cb0f86a3470221670": "${env:HOME}${env:USERPROFILE}\\.rustup\\toolchains\\nightly-i686-pc-windows-msvc\\lib\\rustlib\\src\\rust"
+            },
+        },
+        {
+            "name": "Game.exe",
+            "type": "cppvsdbg",
+            "request": "launch",
+            "program": "C:/Program Files (x86)/Diablo II/Game.exe",
+            "args": ["-w"],
             "stopAtEntry": false,
             "externalConsole": false,
             "cwd": "${workspaceFolder}/target/i686-pc-windows-msvc/debug/",
+        }
+    ],
+    "compounds": [
+        {
+            "name": "Game.exe/rlinjector",
+            "configurations": ["rlinjector", "Game.exe"],
             "preLaunchTask": "rust: cargo build",
-            "sourceFileMap": {
-                "/rustc/118b50524b79e565f017e08bce9b90a16c63634f": "${env:HOME}${env:USERPROFILE}\\.rustup\\toolchains\\stable-i686-pc-windows-msvc\\lib\\rustlib\\src\\rust"
-            }
         }
     ]
 }

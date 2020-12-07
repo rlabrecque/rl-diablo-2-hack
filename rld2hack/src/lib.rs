@@ -194,3 +194,11 @@ pub extern "system" fn DllMain(
 
     return winapi::shared::minwindef::TRUE;
 }
+
+#[no_mangle]
+#[allow(non_snake_case)]
+pub extern "system" fn UnloadModule(_base: winapi::shared::minwindef::LPVOID) -> winapi::shared::minwindef::DWORD {
+    println!("UnloadModule");
+
+    return winapi::shared::minwindef::TRUE as _;
+}

@@ -1,15 +1,23 @@
 use structopt::StructOpt;
 
 #[derive(Debug, StructOpt)]
+pub enum Command {
+    Inject {
+        #[structopt(parse(from_os_str))]
+        dll_path: std::path::PathBuf,
+
+        ///
+        #[structopt(short)]
+        process_name: String,
+    },
+}
+
+#[derive(Debug, StructOpt)]
 #[structopt(name = "rlinjector", about = "Extracts strings from files.")]
 pub struct Options {
     ///
-    #[structopt(parse(from_os_str))]
-    pub dll_path: std::path::PathBuf,
-
-    ///
-    #[structopt(short)]
-    pub process_name: String,
+    #[structopt(subcommand)]
+    pub command: Command
 }
 
 impl Default for Options {
