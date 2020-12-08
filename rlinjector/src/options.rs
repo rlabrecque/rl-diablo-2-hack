@@ -17,7 +17,7 @@ pub enum Command {
 pub struct Options {
     ///
     #[structopt(subcommand)]
-    pub command: Command
+    pub command: Command,
 }
 
 impl Default for Options {

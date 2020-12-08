@@ -165,8 +165,7 @@ pub fn find_remote_module_by_path(process_id: u32, dll_path: &std::path::Path) -
                 break;
             }
         }
-    }
-    else {
+    } else {
         rlwindows::print_get_last_err();
         println!("module32_first failed...");
     }
@@ -217,7 +216,7 @@ pub fn inject_library(process_handle: winapi::um::winnt::HANDLE, dll_path: &std:
     }
 
     let mut bytes_written = winapi::shared::basetsd::SIZE_T::default();
-    let bytes_written_ptr= &mut bytes_written;
+    let bytes_written_ptr = &mut bytes_written;
     let wpm_ret = rlwindows::write_process_memory(
         process_handle,
         remote_string,
@@ -348,7 +347,6 @@ pub fn find_module(
         let mut module_name = String::from_utf16_lossy(&buf);
         module_name.truncate(n as usize);
 
-
         if module_name.to_lowercase() == name {
             return module;
         }
@@ -357,7 +355,10 @@ pub fn find_module(
     return std::ptr::null_mut();
 }
 
-pub fn unload_library(process_handle: winapi::um::winnt::HANDLE, dll_handle: winapi::shared::minwindef::HMODULE) -> bool {
+pub fn unload_library(
+    process_handle: winapi::um::winnt::HANDLE,
+    dll_handle: winapi::shared::minwindef::HMODULE,
+) -> bool {
     if process_handle == std::ptr::null_mut() {
         println!("Process does not exist or is not accessible.");
         return false;
@@ -416,7 +417,10 @@ pub fn unload_library(process_handle: winapi::um::winnt::HANDLE, dll_handle: win
     true
 }
 
-pub fn shutdown_library(process_handle: winapi::um::winnt::HANDLE, dll_handle: winapi::shared::minwindef::HMODULE) -> bool {
+pub fn shutdown_library(
+    process_handle: winapi::um::winnt::HANDLE,
+    dll_handle: winapi::shared::minwindef::HMODULE,
+) -> bool {
     if process_handle == std::ptr::null_mut() {
         println!("Process does not exist or is not accessible.");
         return false;
@@ -466,7 +470,10 @@ pub fn shutdown_library(process_handle: winapi::um::winnt::HANDLE, dll_handle: w
     true
 }
 
-pub fn find_remote_module_base_address_by_handle(process_id: u32, module_handle: winapi::shared::minwindef::HMODULE) -> *mut winapi::shared::minwindef::BYTE {
+pub fn find_remote_module_base_address_by_handle(
+    process_id: u32,
+    module_handle: winapi::shared::minwindef::HMODULE,
+) -> *mut winapi::shared::minwindef::BYTE {
     let mut module_entry = winapi::um::tlhelp32::MODULEENTRY32W {
         dwSize: std::mem::size_of::<winapi::um::tlhelp32::MODULEENTRY32W>() as u32,
         th32ModuleID: 0,
@@ -496,8 +503,7 @@ pub fn find_remote_module_base_address_by_handle(process_id: u32, module_handle:
                 break;
             }
         }
-    }
-    else {
+    } else {
         rlwindows::print_get_last_err();
         println!("module32_first failed...");
     }
@@ -509,7 +515,10 @@ pub fn find_remote_module_base_address_by_handle(process_id: u32, module_handle:
     return base_address;
 }
 
-pub fn find_remote_module_path_by_handle(process_id: u32, module_handle: winapi::shared::minwindef::HMODULE) -> std::path::PathBuf {
+pub fn find_remote_module_path_by_handle(
+    process_id: u32,
+    module_handle: winapi::shared::minwindef::HMODULE,
+) -> std::path::PathBuf {
     use std::os::windows::ffi::OsStringExt;
 
     let mut module_entry = winapi::um::tlhelp32::MODULEENTRY32W {
@@ -548,8 +557,7 @@ pub fn find_remote_module_path_by_handle(process_id: u32, module_handle: winapi:
                 break;
             }
         }
-    }
-    else {
+    } else {
         rlwindows::print_get_last_err();
         println!("module32_first failed...");
     }

@@ -21,7 +21,8 @@ fn inject(dll_path: std::path::PathBuf, process_name: String) -> Result<(), Box<
     let r = running.clone();
     ctrlc::set_handler(move || {
         r.store(false, std::sync::atomic::Ordering::SeqCst);
-    }).expect("Error setting Ctrl-C handler");
+    })
+    .expect("Error setting Ctrl-C handler");
 
     let abs_dll_path = std::fs::canonicalize(dll_path)?;
 
@@ -35,7 +36,7 @@ fn inject(dll_path: std::path::PathBuf, process_name: String) -> Result<(), Box<
                     if loaded {
                         return true;
                     }
-                },
+                }
                 Err(_) => {
                     // TODO: Remove from list of injectedprocess ids'
                 }

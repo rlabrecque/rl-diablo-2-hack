@@ -58,40 +58,19 @@ fn dll_attach(base: winapi::shared::minwindef::LPVOID) {
             d2::variables::get_gold_dialog_action(&game),
             d2::variables::get_gold_dialog_amount(&game)
         );
-        println!(
-            "NPC Menu Amount: {}",
-            d2::variables::get_npc_menu_amount(&game)
-        );
-        println!(
-            "Regular Cursor Type: {}",
-            d2::variables::get_regular_cursor_type(&game)
-        );
-        println!(
-            "Shop Cursor Type: {}",
-            d2::variables::get_shop_cursor_type(&game)
-        );
+        println!("NPC Menu Amount: {}", d2::variables::get_npc_menu_amount(&game));
+        println!("Regular Cursor Type: {}", d2::variables::get_regular_cursor_type(&game));
+        println!("Shop Cursor Type: {}", d2::variables::get_shop_cursor_type(&game));
         println!("FPS: {}", d2::variables::get_fps(&game));
         println!("Skip: {}", d2::variables::get_skip(&game));
         println!("Ping: {}", d2::variables::get_ping(&game));
         println!("Lang: {}", d2::variables::get_lang(&game));
         println!("Divisor: {}", d2::variables::get_divisor(&game));
-        println!(
-            "Overhead Trigger: {}",
-            d2::variables::get_overhead_trigger(&game)
-        );
-        println!(
-            "Recent Interact Id: {}",
-            d2::variables::get_recent_interact_id(&game)
-        );
-        println!(
-            "Item Price List: {}",
-            d2::variables::get_item_price_list(&game)
-        );
+        println!("Overhead Trigger: {}", d2::variables::get_overhead_trigger(&game));
+        println!("Recent Interact Id: {}", d2::variables::get_recent_interact_id(&game));
+        println!("Item Price List: {}", d2::variables::get_item_price_list(&game));
         println!("Waypoint Table: {}", d2::variables::get_waypoint_table(&game));
-        println!(
-            "Is Weapon Swapped: {}",
-            d2::variables::get_is_weapon_swapped(&game)
-        );
+        println!("Is Weapon Swapped: {}", d2::variables::get_is_weapon_swapped(&game));
         println!(
             "Trade: Accepted: {} Blocked: {} Recent Trade Id: {}",
             d2::variables::get_is_trade_accepted(&game),
@@ -104,19 +83,13 @@ fn dll_attach(base: winapi::shared::minwindef::LPVOID) {
         println!("No Pickup: {}", d2::variables::get_no_pickup(&game));
         println!("Chat Message: {}", d2::variables::get_chat_message(&game));
         println!("Orfice Id: {}", d2::variables::get_orifice_id(&game));
-        println!(
-            "Cursor Item Mode: {}",
-            d2::variables::get_cursor_item_mode(&game)
-        );
+        println!("Cursor Item Mode: {}", d2::variables::get_cursor_item_mode(&game));
 
         println!("");
 
         println!("Automap Size: {}", d2::functions::get_automap_size(&game));
         println!("Difficulty: {}", d2::functions::get_difficulty(&game));
-        println!(
-            "Game Language Code: {}",
-            d2::functions::get_game_language_code(&game)
-        );
+        println!("Game Language Code: {}", d2::functions::get_game_language_code(&game));
         println!(
             "Mouse Offset: ({}, {})",
             d2::functions::get_mouse_x_offset(&game),
@@ -168,12 +141,13 @@ pub extern "system" fn DllMain(
 
             unsafe {
                 THREAD_HANDLE = rlwindows::create_thread(
-                std::ptr::null_mut(),
-                0,
-                Some(dll_attach_wrapper),
-                hinst_dll as _,
-                0,
-                &mut thread_id);
+                    std::ptr::null_mut(),
+                    0,
+                    Some(dll_attach_wrapper),
+                    hinst_dll as _,
+                    0,
+                    &mut thread_id,
+                );
             }
         }
         winapi::um::winnt::DLL_THREAD_ATTACH => {

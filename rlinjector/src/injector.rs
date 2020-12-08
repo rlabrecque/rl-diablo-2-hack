@@ -13,7 +13,10 @@ pub fn enable_debug_privilege() -> Result<(), Box<dyn std::error::Error>> {
 
 ///
 ///
-pub fn is_dll_loaded_in_pid(dll_path: &std::path::PathBuf, process_id: u32) -> Result<bool, Box<dyn std::error::Error>> {
+pub fn is_dll_loaded_in_pid(
+    dll_path: &std::path::PathBuf,
+    process_id: u32,
+) -> Result<bool, Box<dyn std::error::Error>> {
     let process_handle = rlwindows::open_process(
         process_id,
         winapi::um::winnt::PROCESS_QUERY_INFORMATION | winapi::um::winnt::PROCESS_VM_READ,
