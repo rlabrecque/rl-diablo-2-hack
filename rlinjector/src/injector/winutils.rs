@@ -147,13 +147,7 @@ pub fn find_remote_module_by_path(process_id: u32, dll_path: &std::path::Path) -
     println!("Trying to find: {} in process: {}", dll_path.display(), process_id);
 
     if rlwindows::module32_first(snapshot, &mut module_entry) {
-        let filename: std::ffi::OsString = std::ffi::OsString::from_wide(&module_entry.szExePath);
-        let filename: &str = filename.to_str().unwrap();
-        let filename: widestring::WideCString = widestring::WideCString::from_str_with_nul(filename).unwrap();
-        let filename: String = filename.to_string_lossy();
-        let filename: std::path::PathBuf = std::path::PathBuf::from(filename);
-
-        while rlwindows::module32_next(snapshot, &mut module_entry) {
+        loop {
             let filename: std::ffi::OsString = std::ffi::OsString::from_wide(&module_entry.szExePath);
             let filename: &str = filename.to_str().unwrap();
             let filename: widestring::WideCString = widestring::WideCString::from_str_with_nul(filename).unwrap();
@@ -162,6 +156,10 @@ pub fn find_remote_module_by_path(process_id: u32, dll_path: &std::path::Path) -
 
             if filename == *dll_path {
                 module_handle = module_entry.hModule;
+                break;
+            }
+
+            if !rlwindows::module32_next(snapshot, &mut module_entry) {
                 break;
             }
         }
@@ -445,10 +443,15 @@ pub fn find_remote_module_base_address_by_handle(
     }
 
     let mut base_address: *mut winapi::shared::minwindef::BYTE = std::ptr::null_mut();
+
     if rlwindows::module32_first(snapshot, &mut module_entry) {
-        while rlwindows::module32_next(snapshot, &mut module_entry) {
+        loop {
             if module_entry.hModule == module_handle {
                 base_address = module_entry.modBaseAddr;
+                break;
+            }
+
+            if !rlwindows::module32_next(snapshot, &mut module_entry) {
                 break;
             }
         }
@@ -495,7 +498,7 @@ pub fn find_remote_module_path_by_handle(
     let mut module_path: std::path::PathBuf = std::path::PathBuf::new();
 
     if rlwindows::module32_first(snapshot, &mut module_entry) {
-        while rlwindows::module32_next(snapshot, &mut module_entry) {
+        loop {
             if module_entry.hModule == module_handle {
                 let filename: std::ffi::OsString = std::ffi::OsString::from_wide(&module_entry.szExePath);
                 let filename: &str = filename.to_str().unwrap();
@@ -503,6 +506,10 @@ pub fn find_remote_module_path_by_handle(
                 let filename: String = filename.to_string_lossy();
 
                 module_path = std::path::PathBuf::from(filename);
+                break;
+            }
+
+            if !rlwindows::module32_next(snapshot, &mut module_entry) {
                 break;
             }
         }
