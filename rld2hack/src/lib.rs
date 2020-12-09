@@ -13,7 +13,7 @@ use library::Library;
 static THREAD_RUNNING: std::sync::atomic::AtomicBool = std::sync::atomic::AtomicBool::new(true);
 static mut THREAD_HANDLE: winapi::um::winnt::HANDLE = std::ptr::null_mut();
 
-fn dll_attach(base: winapi::shared::minwindef::LPVOID) {
+fn dll_attach() {
     println!("Attach!");
 
     let game = Library::new("Game.exe".to_owned());
@@ -110,7 +110,7 @@ fn dll_attach(base: winapi::shared::minwindef::LPVOID) {
 unsafe extern "system" fn dll_attach_wrapper(
     base: winapi::shared::minwindef::LPVOID,
 ) -> winapi::shared::minwindef::DWORD {
-    match std::panic::catch_unwind(|| dll_attach(base)) {
+    match std::panic::catch_unwind(|| dll_attach()) {
         Err(e) => {
             println!("`dll_attach` has panicked: {:#?}", e);
         }
@@ -129,7 +129,7 @@ unsafe extern "system" fn dll_attach_wrapper(
 pub extern "system" fn DllMain(
     hinst_dll: winapi::shared::minwindef::HINSTANCE,
     fdw_reason: winapi::shared::minwindef::DWORD,
-    lpv_reserved: winapi::shared::minwindef::LPVOID,
+    _lpv_reserved: winapi::shared::minwindef::LPVOID,
 ) -> winapi::shared::minwindef::BOOL {
     match fdw_reason {
         winapi::um::winnt::DLL_PROCESS_ATTACH => {

@@ -54,7 +54,9 @@ impl Drop for D2Core {
         }
 
         unsafe {
-            //self.exit_game_detour.disable().unwrap();
+            self.exit_game_detour.disable().unwrap();
+            self.print_game_string_detour.disable().unwrap();
+            self.game_packet_received_detour.disable().unwrap();
         }
     }
 }
