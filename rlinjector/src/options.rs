@@ -10,6 +10,15 @@ pub enum Command {
         #[structopt(short)]
         process_name: String,
     },
+    /*Create {
+        ///
+        #[structopt(parse(from_os_str))]
+        dll_path: std::path::PathBuf,
+
+        ///
+        #[structopt(short)]
+        process_path: std::path::PathBuf,
+    },*/
 }
 
 #[derive(Debug, StructOpt)]

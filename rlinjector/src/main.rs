@@ -66,3 +66,19 @@ fn inject(dll_path: std::path::PathBuf, process_name: String) -> Result<(), Box<
     Ok(())
 }
 
+// TODO:
+/*
+fn create(dll_path: std::path::PathBuf, process_path: std::path::PathBuf) -> Result<(), Box<dyn std::error::Error>> {
+    let abs_dll_path = std::fs::canonicalize(dll_path)?;
+
+    let mut create_proc_id: u32 = 0;
+    let success = injector::create_process_and_inject_library(&process_path, &abs_dll_path, &mut create_proc_id);
+
+    println!("{} - Created Process: {}", success, create_proc_id);
+
+    std::thread::sleep(std::time::Duration::from_secs(300));
+
+    //injector::call_remote_function2(create_proc_id, &abs_dll_path);
+
+    Ok(())
+}*/

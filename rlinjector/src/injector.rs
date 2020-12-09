@@ -104,6 +104,7 @@ fn inject_dll_into_process_ids(
     Ok(injected_process_ids)
 }
 
+/*
 #[cfg(target_arch = "x86")]
 pub fn unload(dll_path: &std::path::PathBuf, process_ids: Vec<u32>) -> Result<(), Box<dyn std::error::Error>> {
     println!("Unloading Dll: {}.", dll_path.display());
@@ -118,7 +119,7 @@ pub fn unload(dll_path: &std::path::PathBuf, process_ids: Vec<u32>) -> Result<()
         if remote_module != std::ptr::null_mut() {
             println!("DLL exists in process. HMODULE: {:?}.", remote_module);
             let success = winutils::unload_library(process_handle, remote_module);
-            //println!("unload_library: {}", success);
+            println!("unload_library: {}", success);
         } else {
             println!("Could not find {} in process: {}", dll_path.display(), process_id);
         }
@@ -131,8 +132,9 @@ pub fn unload(dll_path: &std::path::PathBuf, process_ids: Vec<u32>) -> Result<()
 
     Ok(())
 }
+*/
 
-pub fn create_process_and_inject_library(
+/*pub fn create_process_and_inject_library(
     exe_path: &std::path::Path,
     dll_path: &std::path::Path,
     process_id: &mut u32,
@@ -222,6 +224,7 @@ pub fn create_process_and_inject_library(
     *process_id = 0;
     return false;
 }
+*/
 
 pub fn call_remote_function2(process_id: u32, dll_path: &std::path::PathBuf, func_name: &str) -> bool {
     let process_handle: winapi::um::winnt::HANDLE = rlwindows::open_process(

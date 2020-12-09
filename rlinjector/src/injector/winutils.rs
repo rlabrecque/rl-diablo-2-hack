@@ -51,7 +51,7 @@ pub fn get_process_ids_from_name(process_name: &str) -> Vec<u32> {
     return process_ids;
 }
 
-pub fn is_process_elevated(process_handle: winapi::um::winnt::HANDLE) -> bool {
+/*pub fn is_process_elevated(process_handle: winapi::um::winnt::HANDLE) -> bool {
     let mut is_elevated = false;
     let mut token_handle: winapi::um::winnt::HANDLE = std::ptr::null_mut();
 
@@ -75,7 +75,7 @@ pub fn is_process_elevated(process_handle: winapi::um::winnt::HANDLE) -> bool {
     }
 
     return is_elevated;
-}
+}*/
 
 pub fn enable_debug_privilege() -> bool {
     let mut token_handle: winapi::um::winnt::HANDLE = std::ptr::null_mut();
@@ -355,6 +355,7 @@ pub fn find_module(
     return std::ptr::null_mut();
 }
 
+/*
 pub fn unload_library(
     process_handle: winapi::um::winnt::HANDLE,
     dll_handle: winapi::shared::minwindef::HMODULE,
@@ -416,59 +417,7 @@ pub fn unload_library(
 
     true
 }
-
-pub fn shutdown_library(
-    process_handle: winapi::um::winnt::HANDLE,
-    dll_handle: winapi::shared::minwindef::HMODULE,
-) -> bool {
-    if process_handle == std::ptr::null_mut() {
-        println!("Process does not exist or is not accessible.");
-        return false;
-    }
-
-    // TODO: Leaking free_library_address
-    let free_library_str = "UnloadModule";
-    let free_library_cstring = std::ffi::CString::new(free_library_str).unwrap();
-    let free_library_address = rlwindows::get_proc_address(dll_handle, 2 as _);
-    if free_library_address == std::ptr::null_mut() {
-        println!("Failed to find '{}' in module: {:?}.", free_library_str, dll_handle);
-        return false;
-    }
-
-    let start_routine = unsafe {
-        Some(::std::mem::transmute::<
-            winapi::shared::minwindef::FARPROC,
-            unsafe extern "system" fn(
-                lpThreadParameter: winapi::shared::minwindef::LPVOID,
-            ) -> winapi::shared::minwindef::DWORD,
-        >(free_library_address))
-    };
-
-    let mut thread_id: winapi::shared::minwindef::DWORD = 0;
-    let thread_id_ptr: *mut winapi::shared::minwindef::DWORD =
-        &mut thread_id as *mut _ as *mut winapi::shared::minwindef::DWORD;
-
-    let thread_handle = rlwindows::create_remote_thread(
-        process_handle,
-        std::ptr::null_mut(),
-        0,
-        start_routine,
-        dll_handle as _,
-        0,
-        thread_id_ptr,
-    );
-
-    if thread_handle == std::ptr::null_mut() {
-        println!("Failed to free the module.");
-        return false;
-    }
-
-    rlwindows::wait_for_single_object(thread_handle, winapi::um::winbase::INFINITE);
-
-    rlwindows::close_handle(thread_handle);
-
-    true
-}
+*/
 
 pub fn find_remote_module_base_address_by_handle(
     process_id: u32,
