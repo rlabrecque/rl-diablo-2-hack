@@ -15,7 +15,8 @@
             "preLaunchTask": "rust: cargo build",
             "cwd": "${workspaceFolder}/target/i686-pc-windows-msvc/debug/",
             "sourceFileMap": {
-                "/rustc/593fe977a77ad5a7aec23c6cb0f86a3470221670": "${env:HOME}${env:USERPROFILE}\\.rustup\\toolchains\\nightly-i686-pc-windows-msvc\\lib\\rustlib\\src\\rust"
+                "/rustc/593fe977a77ad5a7aec23c6cb0f86a3470221670": "${env:HOME}${env:USERPROFILE}\\.rustup\\toolchains\\nightly-i686-pc-windows-msvc\\lib\\rustlib\\src\\rust",
+                "d:\\rustc\\593fe977a77ad5a7aec23c6cb0f86a3470221670": "${env:HOME}${env:USERPROFILE}\\.rustup\\toolchains\\nightly-i686-pc-windows-msvc\\lib\\rustlib\\src\\rust",
             },
         },
         {
@@ -27,6 +28,10 @@
             "stopAtEntry": false,
             "externalConsole": false,
             "cwd": "${workspaceFolder}/target/i686-pc-windows-msvc/debug/",
+            "sourceFileMap": {
+                "/rustc/593fe977a77ad5a7aec23c6cb0f86a3470221670": "${env:HOME}${env:USERPROFILE}\\.rustup\\toolchains\\nightly-i686-pc-windows-msvc\\lib\\rustlib\\src\\rust",
+                "d:\\rustc\\593fe977a77ad5a7aec23c6cb0f86a3470221670": "${env:HOME}${env:USERPROFILE}\\.rustup\\toolchains\\nightly-i686-pc-windows-msvc\\lib\\rustlib\\src\\rust",
+            },
         }
     ],
     "compounds": [

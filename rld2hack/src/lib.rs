@@ -17,7 +17,7 @@ fn dll_attach() {
     let d2core = D2Core::new();
 
     while THREAD_RUNNING.load(std::sync::atomic::Ordering::Relaxed) {
-        println!("");
+        /*println!("");
         println!(
             "ScreenSize: {}x{}",
             d2::variables::get_screensize_x(&d2core.game),
@@ -118,7 +118,7 @@ fn dll_attach() {
 
         //d2::functions::close_npc_interact(&d2core.game);
         //d2::functions::close_interact(&d2core.game);
-        //d2::functions::exit_game(&d2core);
+        //d2::functions::exit_game(&d2core);*/
 
         println!("Running!");
         std::thread::sleep(std::time::Duration::from_millis(500));
