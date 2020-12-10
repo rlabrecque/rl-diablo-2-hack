@@ -1,9 +1,9 @@
-pub struct Library {
+pub struct D2Library {
     pub name: String,
     pub handle: winapi::shared::minwindef::HMODULE,
 }
 
-impl Library {
+impl D2Library {
     pub fn new(name: String) -> Self {
         let file_name: widestring::WideCString = widestring::WideCString::from_str(&name).unwrap();
         let process_handle = rlwindows::load_library(file_name.as_ptr());
@@ -13,7 +13,7 @@ impl Library {
 
         println!("{} successfully loaded at offset {:?}", name, process_handle);
 
-        Library {
+        D2Library {
             name: name,
             handle: process_handle,
         }
@@ -40,7 +40,7 @@ impl Library {
     }
 }
 
-impl Drop for Library {
+impl Drop for D2Library {
     fn drop(&mut self) {
         if self.is_loaded() {
             rlwindows::free_library(self.handle);

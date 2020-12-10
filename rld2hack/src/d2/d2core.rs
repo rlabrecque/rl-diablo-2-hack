@@ -1,9 +1,9 @@
+use super::d2library::D2Library;
 use super::functions;
-use crate::library::Library;
 use detour::GenericDetour;
 
 pub struct D2Core {
-    pub game: Library,
+    pub game: D2Library,
 
     pub exit_game_detour: GenericDetour<functions::ExitGameFn>,
     pub print_game_string_detour: GenericDetour<functions::PrintGameStringFn>,
@@ -14,8 +14,11 @@ impl D2Core {
     /// Constructs a new copy of D2Core.
     /// Note: This also initializes the singleton used for accessing D2Core
     /// from detoured functions. The singleton can be accessed via get().
-    pub fn new(game: Library) -> Box<Self> {
+    pub fn new() -> Box<Self> {
         println!("D2Core - Initialize");
+
+        let game = D2Library::new("Game.exe".to_owned());
+
         let exit_game_detour = functions::create_hook_exit_game(&game);
         let print_game_string_detour = functions::create_hook_print_game_string(&game);
         let game_packet_received_detour = functions::create_hook_game_packet_received(&game);
@@ -32,11 +35,11 @@ impl D2Core {
             INSTANCE = std::mem::transmute(d2core);
 
             // Get that instance back out of INSTANCE so that we can return it.
-            let d2core: Box<D2Core> = std::mem::transmute(INSTANCE);
-            d2core
+            std::mem::transmute(INSTANCE)
         }
     }
 
+    // Gets the global D2Core instance, this should only ever be used inside callbacks
     pub fn get() -> &'static Self {
         unsafe {
             assert!(INSTANCE != std::ptr::null_mut(), "D2Core is not initialized!");

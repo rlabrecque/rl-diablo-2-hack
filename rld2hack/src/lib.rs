@@ -5,10 +5,8 @@ compile_error!("This only works on Windows.");
 compile_error!("This only works on 32bit.");
 
 pub mod d2;
-pub mod library;
 
 use d2::d2core::D2Core;
-use library::Library;
 
 static THREAD_RUNNING: std::sync::atomic::AtomicBool = std::sync::atomic::AtomicBool::new(true);
 static mut THREAD_HANDLE: winapi::um::winnt::HANDLE = std::ptr::null_mut();
@@ -16,8 +14,7 @@ static mut THREAD_HANDLE: winapi::um::winnt::HANDLE = std::ptr::null_mut();
 fn dll_attach() {
     println!("Attach!");
 
-    let game = Library::new("Game.exe".to_owned());
-    let d2core = D2Core::new(game);
+    let d2core = D2Core::new();
 
     while THREAD_RUNNING.load(std::sync::atomic::Ordering::Relaxed) {
         println!("");
@@ -59,18 +56,33 @@ fn dll_attach() {
             d2::variables::get_gold_dialog_amount(&d2core.game)
         );
         println!("NPC Menu Amount: {}", d2::variables::get_npc_menu_amount(&d2core.game));
-        println!("Regular Cursor Type: {}", d2::variables::get_regular_cursor_type(&d2core.game));
-        println!("Shop Cursor Type: {}", d2::variables::get_shop_cursor_type(&d2core.game));
+        println!(
+            "Regular Cursor Type: {}",
+            d2::variables::get_regular_cursor_type(&d2core.game)
+        );
+        println!(
+            "Shop Cursor Type: {}",
+            d2::variables::get_shop_cursor_type(&d2core.game)
+        );
         println!("FPS: {}", d2::variables::get_fps(&d2core.game));
         println!("Skip: {}", d2::variables::get_skip(&d2core.game));
         println!("Ping: {}", d2::variables::get_ping(&d2core.game));
         println!("Lang: {}", d2::variables::get_lang(&d2core.game));
         println!("Divisor: {}", d2::variables::get_divisor(&d2core.game));
-        println!("Overhead Trigger: {}", d2::variables::get_overhead_trigger(&d2core.game));
-        println!("Recent Interact Id: {}", d2::variables::get_recent_interact_id(&d2core.game));
+        println!(
+            "Overhead Trigger: {}",
+            d2::variables::get_overhead_trigger(&d2core.game)
+        );
+        println!(
+            "Recent Interact Id: {}",
+            d2::variables::get_recent_interact_id(&d2core.game)
+        );
         println!("Item Price List: {}", d2::variables::get_item_price_list(&d2core.game));
         println!("Waypoint Table: {}", d2::variables::get_waypoint_table(&d2core.game));
-        println!("Is Weapon Swapped: {}", d2::variables::get_is_weapon_swapped(&d2core.game));
+        println!(
+            "Is Weapon Swapped: {}",
+            d2::variables::get_is_weapon_swapped(&d2core.game)
+        );
         println!(
             "Trade: Accepted: {} Blocked: {} Recent Trade Id: {}",
             d2::variables::get_is_trade_accepted(&d2core.game),
@@ -83,13 +95,19 @@ fn dll_attach() {
         println!("No Pickup: {}", d2::variables::get_no_pickup(&d2core.game));
         println!("Chat Message: {}", d2::variables::get_chat_message(&d2core.game));
         println!("Orfice Id: {}", d2::variables::get_orifice_id(&d2core.game));
-        println!("Cursor Item Mode: {}", d2::variables::get_cursor_item_mode(&d2core.game));
+        println!(
+            "Cursor Item Mode: {}",
+            d2::variables::get_cursor_item_mode(&d2core.game)
+        );
 
         println!("");
 
         println!("Automap Size: {}", d2::functions::get_automap_size(&d2core.game));
         println!("Difficulty: {}", d2::functions::get_difficulty(&d2core.game));
-        println!("Game Language Code: {}", d2::functions::get_game_language_code(&d2core.game));
+        println!(
+            "Game Language Code: {}",
+            d2::functions::get_game_language_code(&d2core.game)
+        );
         println!(
             "Mouse Offset: ({}, {})",
             d2::functions::get_mouse_x_offset(&d2core.game),

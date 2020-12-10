@@ -1,5 +1,5 @@
 use super::d2core::D2Core;
-use crate::library::Library;
+use super::d2library::D2Library;
 
 use detour::GenericDetour;
 
@@ -29,7 +29,7 @@ FUNCPTR(D2CLIENT, ShopAction, void __fastcall, (UnitAny * pNpc, UnitAny* pItem, 
         0xB3870) // Updated 1.14d //004B3870-BASE
 */
 
-pub fn close_npc_interact(game: &Library) {
+pub fn close_npc_interact(game: &D2Library) {
     type CloseNPCInteractFn = extern "fastcall" fn();
 
     unsafe {
@@ -37,7 +37,7 @@ pub fn close_npc_interact(game: &Library) {
     }
 }
 
-pub fn close_interact(game: &Library) {
+pub fn close_interact(game: &D2Library) {
     type CloseInteractFn = extern "fastcall" fn();
 
     unsafe {
@@ -45,7 +45,7 @@ pub fn close_interact(game: &Library) {
     }
 }
 
-pub fn get_automap_size(game: &Library) -> u32 {
+pub fn get_automap_size(game: &D2Library) -> u32 {
     type GetAutomapSizeFn = extern "fastcall" fn() -> u32;
 
     unsafe { std::mem::transmute::<usize, GetAutomapSizeFn>(game.fix_offset(0x5A710usize))() }
@@ -63,13 +63,13 @@ FUNCPTR(D2CLIENT, LeftClickItem_I, void __stdcall,
         0x8FFE0) // Updated 1.14d //0048FFE0-BASE
 */
 
-pub fn get_mouse_x_offset(game: &Library) -> u32 {
+pub fn get_mouse_x_offset(game: &D2Library) -> u32 {
     type GetMouseXOffsetFn = extern "fastcall" fn() -> u32;
 
     unsafe { std::mem::transmute::<usize, GetMouseXOffsetFn>(game.fix_offset(0x5AFB0usize))() }
 }
 
-pub fn get_mouse_y_offset(game: &Library) -> u32 {
+pub fn get_mouse_y_offset(game: &D2Library) -> u32 {
     type GetMouseYOffsetFn = extern "fastcall" fn() -> u32;
 
     unsafe { std::mem::transmute::<usize, GetMouseYOffsetFn>(game.fix_offset(0x5AFC0usize))() }
@@ -77,7 +77,7 @@ pub fn get_mouse_y_offset(game: &Library) -> u32 {
 
 pub type PrintGameStringFn = extern "fastcall" fn(message: *const u16, color: i32);
 
-pub fn create_hook_print_game_string(game: &Library) -> GenericDetour<PrintGameStringFn> {
+pub fn create_hook_print_game_string(game: &D2Library) -> GenericDetour<PrintGameStringFn> {
     unsafe {
         let print_game_string_fn: PrintGameStringFn = std::mem::transmute(game.fix_offset(0x9E3A0));
 
@@ -105,7 +105,7 @@ pub fn print_game_string(d2core: &D2Core, message: &str, color: i32) {
     }
 }
 
-pub fn print_party_string(game: &Library, message: &str, color: i32) {
+pub fn print_party_string(game: &D2Library, message: &str, color: i32) {
     type PrintPartyStringFn = extern "fastcall" fn(message: *const u16, color: i32);
 
     unsafe {
@@ -125,7 +125,7 @@ FUNCPTR(D2CLIENT, CancelTrade, void __fastcall, (void), 0xB90B0) // Updated 1.14
 FUNCPTR(D2CLIENT, TradeOK, void __stdcall, (void), 0xB8A30)      // Updated 1.14d //004B8A30-BASE
 */
 
-pub fn get_difficulty(game: &Library) -> u8 {
+pub fn get_difficulty(game: &D2Library) -> u8 {
     type GetDifficultyFn = extern "stdcall" fn() -> u8;
 
     unsafe { std::mem::transmute::<usize, GetDifficultyFn>(game.fix_offset(0x4DCD0usize))() }
@@ -150,7 +150,7 @@ FUNCPTR(D2CLIENT, TestPvpFlag, DWORD __fastcall, (DWORD dwUnitId1, DWORD dwUnitI
 
 */
 
-pub fn get_game_language_code(game: &Library) -> u32 {
+pub fn get_game_language_code(game: &D2Library) -> u32 {
     type GetGameLanguageCodeFn = extern "fastcall" fn() -> u32;
 
     unsafe { std::mem::transmute::<usize, GetGameLanguageCodeFn>(game.fix_offset(0x125150usize))() }
@@ -158,7 +158,7 @@ pub fn get_game_language_code(game: &Library) -> u32 {
 
 pub type ExitGameFn = extern "fastcall" fn();
 
-pub fn create_hook_exit_game(game: &Library) -> GenericDetour<ExitGameFn> {
+pub fn create_hook_exit_game(game: &D2Library) -> GenericDetour<ExitGameFn> {
     unsafe {
         let exit_game_fn: ExitGameFn = std::mem::transmute(game.fix_offset(0x4DD60));
 
@@ -185,7 +185,7 @@ pub fn exit_game(d2core: &D2Core) {
 
 pub type GamePacketReceivedFn = extern "fastcall" fn(packet: *const u8, size: i32) -> i32;
 
-pub fn create_hook_game_packet_received(game: &Library) -> GenericDetour<GamePacketReceivedFn> {
+pub fn create_hook_game_packet_received(game: &D2Library) -> GenericDetour<GamePacketReceivedFn> {
     unsafe {
         let game_packet_received_fn: GamePacketReceivedFn = std::mem::transmute(game.fix_offset(0x12AEB0));
 
