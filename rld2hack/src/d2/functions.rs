@@ -184,11 +184,11 @@ pub fn exit_game(d2core: &D2Core) {
     {PatchJmp, GetDllOffset("D2Client.dll", 0x12AE5A), (DWORD)GamePacketSent_Interception, 5},  // Updated 1.14d //0052AE5A-BASE
 */
 
-pub type GamePacketReceivedFn = extern "fastcall" fn(packet: *const u8, size: i32) -> i32;
+pub type GamePacketReceivedFn = extern "fastcall" fn(packet: *const u8, size: i32);
 
 pub fn create_hook_game_packet_received(game: &D2Library) -> GenericDetour<GamePacketReceivedFn> {
     unsafe {
-        let game_packet_received_fn: GamePacketReceivedFn = std::mem::transmute(game.fix_offset(0x12AEB0));
+        let game_packet_received_fn: GamePacketReceivedFn = std::mem::transmute(game.fix_offset(0x5F7B0));
 
         let hook_game_packet_received_detour =
             GenericDetour::<GamePacketReceivedFn>::new(game_packet_received_fn, game_packet_received_hook).unwrap();
@@ -197,25 +197,31 @@ pub fn create_hook_game_packet_received(game: &D2Library) -> GenericDetour<GameP
     }
 }
 
-extern "fastcall" fn game_packet_received_hook(packet: *const u8, size: i32) -> i32 {
-    let packet_type = unsafe { *packet.offset(0) };
-    println!("game_packet_received_hook: Packet: 0x{:x}", packet_type);
-    let packet_enum: PacketFromServer = PacketFromServer::convert(packet, size).unwrap();
-    println!(
-        "game_packet_received_hook: Packet: 0x{:x} {:?} Size: {}",
-        packet_type, packet_enum, size
-    );
+extern "fastcall" fn game_packet_received_hook(packet: *const u8, size: i32) {
+    if size != -1 {
+        let packet_type = unsafe { *packet.offset(0) };
+        println!("game_packet_received_hook: Packet: 0x{:x}", packet_type);
 
-    match packet_enum {
-        PacketFromServer::ConnectionInfo(test) => {
-            println!("ConnectionInfo: {:?}", test);
+        let packet_enum: PacketFromServer = PacketFromServer::convert(packet, size).unwrap();
+        println!(
+            "game_packet_received_hook: Packet: 0x{:x} {:?} Size: {}",
+            packet_type, packet_enum, size
+        );
+
+        match packet_enum {
+            PacketFromServer::ConnectionInfo(test) => {
+                println!("ConnectionInfo: {:?}", test);
+            }
+            PacketFromServer::WeaponSwitch => {
+                println!("WeaponSwitch");
+            }
+            _ => {}
         }
-        _ => {}
     }
 
-    D2Core::get().game_packet_received_detour.call(packet, size)
+    D2Core::get().game_packet_received_detour.call(packet, size);
 }
 
-pub fn game_packet_received(d2core: &D2Core, packet: *const u8, size: i32) -> i32 {
-    d2core.game_packet_received_detour.call(packet, size)
+pub fn game_packet_received(d2core: &D2Core, packet: *const u8, size: i32) {
+    d2core.game_packet_received_detour.call(packet, size);
 }

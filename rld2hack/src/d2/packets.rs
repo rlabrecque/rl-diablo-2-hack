@@ -1,20 +1,66 @@
+use super::types;
+
+/// 0x01
+///
+#[repr(C)]
+#[derive(Debug, PartialEq)]
+pub struct GameFlagsPacketBody {
+    difficulty: types::Difficulty,
+    arena_flags: u32,
+    expansion: u8,
+    ladder: u8,
+}
+
+/// 0x8f
+/// Response from C->S Ping packet.
+#[repr(C)]
+#[derive(Debug, PartialEq)]
+pub struct PongPacketBody {
+    /// Always 0x00 * 32
+    bytes: [u8; 32],
+}
+
+/// 0xaf
+#[repr(C)]
+#[derive(Debug, PartialEq)]
+pub struct ConnectionInfoPacketBody {
+    /// Whether compression is enabled or not.
+    compression: bool
+}
+
 #[repr(u8)]
 #[derive(Debug, PartialEq)]
 pub enum PacketFromServer {
+    /// 0x00
+    GameLoading,
     /// 0x01
-    GameFlags,
+    GameFlags(GameFlagsPacketBody),
+    /// 0x02
+    LoadSuccessful,
+    /// 0x03
+    LoadAct,
+    /// 0x04
+    LoadComplete,
     /// 0x05
     UnloadComplete,
+    /// 0x06
+    GameExitSuccessful,
     /// 0x07
     MapReveal,
     /// 0x08
     MapHide,
     /// 0x0a
     RemoveObject,
+    /// 0x0b
+    GameHandshake,
     /// 0x0d
     PlayerStop,
     /// 0x0e
     ObjectState,
+    /// 0x0f
+    PlayerMove,
+    /// 0x15
+    ReassignPlayer,
     /// 0x19
     GoldToInv,
     /// 0x1a
@@ -33,18 +79,28 @@ pub enum PacketFromServer {
     UpdateItemSkill,
     /// 0x23
     SetSkill,
+    /// 0x26
+    GameChat,
     /// 0x27
     NPCInfo,
     /// 0x28
     QuestInfo,
+    /// 0x29
+    GameQuestInfo,
     /// 0x2a
     NPCTransaction,
+    /// 0x37
+    Unknown0x37,
     /// 0x3e
     UpdateItemStats,
     /// 0x3f
     UseStackableItem,
     /// 0x42
     ClearCursor,
+    /// 0x47
+    Relator1,
+    /// 0x48
+    Relator2,
     /// 0x4c
     UnitSkillOnTarget,
     /// 0x4f
@@ -55,8 +111,16 @@ pub enum PacketFromServer {
     Darkness,
     /// 0x59
     AssignPlayer,
+    /// 0x5a
+    EventMessages,
+    /// 0x5b
+    PlayerInGame,
     /// 0x5d
     QuestItemState,
+    /// 0x5e
+    GameQuestAvailability,
+    /// 0x5f
+    Unknown0x5f,
     /// 0x63
     WaypointMenu,
     /// 0x65
@@ -77,10 +141,18 @@ pub enum PacketFromServer {
     PlayerInProximity,
     /// 0x77
     ButtonActions,
+    /// 0x7e
+    ReloadCMNCOF,
     /// 0x8a
     NpcWantsToInteract,
+    /// 0x8d
+    AssignPlayerToParty,
     /// 0x8f
-    Pong,
+    Pong(PongPacketBody),
+    /// 0x91
+    SetNpcGossipAct,
+    /// 0x94
+    BaseSkillLevels,
     /// 0x95
     LifeAndManaUpdate,
     /// 0x96
@@ -95,6 +167,8 @@ pub enum PacketFromServer {
     DelayedState,
     /// 0xa8
     SetState,
+    /// 0xa9
+    EndState,
     /// 0xaa
     AddUnit,
     /// 0xab
@@ -102,7 +176,7 @@ pub enum PacketFromServer {
     /// 0xac
     AssignNPC,
     /// 0xaf
-    ConnectionInfo(u8),
+    ConnectionInfo(ConnectionInfoPacketBody),
     /// 0xb0
     GameConnectionTerminated,
 }
@@ -110,15 +184,24 @@ pub enum PacketFromServer {
 impl PacketFromServer {
     pub fn convert(packet: *const u8, _size: i32) -> Result<Self, ()> {
         let packet_id = unsafe { *packet.offset(0) };
+        let packet = unsafe { packet.offset(1) };
 
         match packet_id {
-            0x01 => Ok(PacketFromServer::GameFlags),
+            0x00 => Ok(PacketFromServer::GameLoading),
+            0x01 => Ok(PacketFromServer::GameFlags(unsafe { (packet as *const GameFlagsPacketBody).read() })),
+            0x02 => Ok(PacketFromServer::LoadSuccessful),
+            0x03 => Ok(PacketFromServer::LoadAct),
+            0x04 => Ok(PacketFromServer::LoadComplete),
             0x05 => Ok(PacketFromServer::UnloadComplete),
+            0x06 => Ok(PacketFromServer::GameExitSuccessful),
             0x07 => Ok(PacketFromServer::MapReveal),
             0x08 => Ok(PacketFromServer::MapHide),
             0x0a => Ok(PacketFromServer::RemoveObject),
+            0x0b => Ok(PacketFromServer::GameHandshake),
             0x0d => Ok(PacketFromServer::PlayerStop),
             0x0e => Ok(PacketFromServer::ObjectState),
+            0x0f => Ok(PacketFromServer::PlayerMove),
+            0x15 => Ok(PacketFromServer::ReassignPlayer),
             0x19 => Ok(PacketFromServer::GoldToInv),
             0x1a => Ok(PacketFromServer::AddExpByte),
             0x1b => Ok(PacketFromServer::AddExpWord),
@@ -128,18 +211,27 @@ impl PacketFromServer {
             0x1f => Ok(PacketFromServer::BaseAttributeDword),
             0x22 => Ok(PacketFromServer::UpdateItemSkill),
             0x23 => Ok(PacketFromServer::SetSkill),
+            0x26 => Ok(PacketFromServer::GameChat),
             0x27 => Ok(PacketFromServer::NPCInfo),
             0x28 => Ok(PacketFromServer::QuestInfo),
+            0x29 => Ok(PacketFromServer::GameQuestInfo),
             0x2a => Ok(PacketFromServer::NPCTransaction),
+            0x37 => Ok(PacketFromServer::Unknown0x37),
             0x3e => Ok(PacketFromServer::UpdateItemStats),
             0x3f => Ok(PacketFromServer::UseStackableItem),
             0x42 => Ok(PacketFromServer::ClearCursor),
+            0x47 => Ok(PacketFromServer::Relator1),
+            0x48 => Ok(PacketFromServer::Relator2),
             0x4c => Ok(PacketFromServer::UnitSkillOnTarget),
             0x4f => Ok(PacketFromServer::ClearMercList),
             0x51 => Ok(PacketFromServer::AssignObject),
             0x53 => Ok(PacketFromServer::Darkness),
             0x59 => Ok(PacketFromServer::AssignPlayer),
+            0x5a => Ok(PacketFromServer::EventMessages),
+            0x5b => Ok(PacketFromServer::PlayerInGame,),
             0x5d => Ok(PacketFromServer::QuestItemState),
+            0x5e => Ok(PacketFromServer::GameQuestAvailability),
+            0x5f => Ok(PacketFromServer::Unknown0x5f),
             0x63 => Ok(PacketFromServer::WaypointMenu),
             0x65 => Ok(PacketFromServer::PlayerKillCount),
             0x67 => Ok(PacketFromServer::NpcMove),
@@ -150,8 +242,12 @@ impl PacketFromServer {
             0x6d => Ok(PacketFromServer::NpcStop),
             0x76 => Ok(PacketFromServer::PlayerInProximity),
             0x77 => Ok(PacketFromServer::ButtonActions),
+            0x7e => Ok(PacketFromServer::ReloadCMNCOF),
             0x8a => Ok(PacketFromServer::NpcWantsToInteract),
-            0x8f => Ok(PacketFromServer::Pong),
+            0x8d => Ok(PacketFromServer::AssignPlayerToParty),
+            0x8f => Ok(PacketFromServer::Pong(unsafe { (packet as *const PongPacketBody).read() })),
+            0x91 => Ok(PacketFromServer::SetNpcGossipAct),
+            0x94 => Ok(PacketFromServer::BaseSkillLevels),
             0x95 => Ok(PacketFromServer::LifeAndManaUpdate),
             0x96 => Ok(PacketFromServer::WalkVerify),
             0x97 => Ok(PacketFromServer::WeaponSwitch),
@@ -159,10 +255,11 @@ impl PacketFromServer {
             0x9d => Ok(PacketFromServer::ItemActionOwned),
             0xa7 => Ok(PacketFromServer::DelayedState),
             0xa8 => Ok(PacketFromServer::SetState),
+            0xa9 => Ok(PacketFromServer::EndState),
             0xaa => Ok(PacketFromServer::AddUnit),
             0xab => Ok(PacketFromServer::NpcHeal),
             0xac => Ok(PacketFromServer::AssignNPC),
-            0xaf => Ok(PacketFromServer::ConnectionInfo(unsafe { *packet.offset(1) })),
+            0xaf => Ok(PacketFromServer::ConnectionInfo(unsafe { (packet as *const ConnectionInfoPacketBody).read() })),
             0xb0 => Ok(PacketFromServer::GameConnectionTerminated),
             _ => Err(()),
         }
