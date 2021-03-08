@@ -49,10 +49,14 @@ pub enum PacketFromServer {
     MapReveal,
     /// 0x08
     MapHide,
+    /// 0x09
+    AssignLevelWarp,
     /// 0x0a
     RemoveObject,
     /// 0x0b
     GameHandshake,
+    /// 0x0c
+    NpcHit,
     /// 0x0d
     PlayerStop,
     /// 0x0e
@@ -75,6 +79,8 @@ pub enum PacketFromServer {
     BaseAttributeWord,
     /// 0x1f
     BaseAttributeDword,
+    /// 0x21
+    UpdateItemOSkill,
     /// 0x22
     UpdateItemSkill,
     /// 0x23
@@ -82,13 +88,15 @@ pub enum PacketFromServer {
     /// 0x26
     GameChat,
     /// 0x27
-    NPCInfo,
+    NpcInfo,
     /// 0x28
     QuestInfo,
     /// 0x29
     GameQuestInfo,
     /// 0x2a
-    NPCTransaction,
+    NpcTransaction,
+    /// 0x2c
+    PlaySound,
     /// 0x37
     Unknown0x37,
     /// 0x3e
@@ -103,6 +111,10 @@ pub enum PacketFromServer {
     Relator2,
     /// 0x4c
     UnitSkillOnTarget,
+    /// 0x4d
+    UnitCastSkill,
+    /// 0x4e
+    MercForHire,
     /// 0x4f
     ClearMercList,
     /// 0x51
@@ -137,6 +149,8 @@ pub enum PacketFromServer {
     NpcAttack,
     /// 0x6d
     NpcStop,
+    /// 0x75
+    PlayerPartyInfo,
     /// 0x76
     PlayerInProximity,
     /// 0x77
@@ -196,8 +210,10 @@ impl PacketFromServer {
             0x06 => Ok(PacketFromServer::GameExitSuccessful),
             0x07 => Ok(PacketFromServer::MapReveal),
             0x08 => Ok(PacketFromServer::MapHide),
+            0x09 => Ok(PacketFromServer::AssignLevelWarp),
             0x0a => Ok(PacketFromServer::RemoveObject),
             0x0b => Ok(PacketFromServer::GameHandshake),
+            0x0c => Ok(PacketFromServer::NpcHit),
             0x0d => Ok(PacketFromServer::PlayerStop),
             0x0e => Ok(PacketFromServer::ObjectState),
             0x0f => Ok(PacketFromServer::PlayerMove),
@@ -209,13 +225,15 @@ impl PacketFromServer {
             0x1d => Ok(PacketFromServer::BaseAttributeByte),
             0x1e => Ok(PacketFromServer::BaseAttributeWord),
             0x1f => Ok(PacketFromServer::BaseAttributeDword),
+            0x21 => Ok(PacketFromServer::UpdateItemOSkill),
             0x22 => Ok(PacketFromServer::UpdateItemSkill),
             0x23 => Ok(PacketFromServer::SetSkill),
             0x26 => Ok(PacketFromServer::GameChat),
-            0x27 => Ok(PacketFromServer::NPCInfo),
+            0x27 => Ok(PacketFromServer::NpcInfo),
             0x28 => Ok(PacketFromServer::QuestInfo),
             0x29 => Ok(PacketFromServer::GameQuestInfo),
-            0x2a => Ok(PacketFromServer::NPCTransaction),
+            0x2a => Ok(PacketFromServer::NpcTransaction),
+            0x2c => Ok(PacketFromServer::PlaySound),
             0x37 => Ok(PacketFromServer::Unknown0x37),
             0x3e => Ok(PacketFromServer::UpdateItemStats),
             0x3f => Ok(PacketFromServer::UseStackableItem),
@@ -223,6 +241,8 @@ impl PacketFromServer {
             0x47 => Ok(PacketFromServer::Relator1),
             0x48 => Ok(PacketFromServer::Relator2),
             0x4c => Ok(PacketFromServer::UnitSkillOnTarget),
+            0x4d => Ok(PacketFromServer::UnitCastSkill),
+            0x4e => Ok(PacketFromServer::MercForHire),
             0x4f => Ok(PacketFromServer::ClearMercList),
             0x51 => Ok(PacketFromServer::AssignObject),
             0x53 => Ok(PacketFromServer::Darkness),
@@ -240,6 +260,7 @@ impl PacketFromServer {
             0x6b => Ok(PacketFromServer::NpcAction),
             0x6c => Ok(PacketFromServer::NpcAttack),
             0x6d => Ok(PacketFromServer::NpcStop),
+            0x75 => Ok(PacketFromServer::PlayerPartyInfo),
             0x76 => Ok(PacketFromServer::PlayerInProximity),
             0x77 => Ok(PacketFromServer::ButtonActions),
             0x7e => Ok(PacketFromServer::ReloadCMNCOF),
