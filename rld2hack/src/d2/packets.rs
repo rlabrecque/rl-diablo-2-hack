@@ -1,35 +1,61 @@
+use enumflags2::BitFlags;
+
 use super::types;
 
 /// 0x01
-///
-#[repr(C)]
-#[derive(Debug, PartialEq)]
+/// Response from C->S GameFlags packet.
+#[repr(C, packed(1))]
+#[derive(Copy, Clone, Debug, PartialEq)]
 pub struct GameFlagsPacketBody {
-    difficulty: types::Difficulty,
-    arena_flags: u32,
-    expansion: u8,
-    ladder: u8,
+    pub packet_id: u8,
+    pub difficulty: types::Difficulty,
+    pub arena_flags: BitFlags<types::ArenaFlags>,
+    pub expansion: bool,
+    pub ladder: bool,
+}
+
+/// 0x19
+/// Response from C->S GoldToInv packet.
+#[repr(C, packed(1))]
+#[derive(Copy, Clone, Debug, PartialEq)]
+pub struct GoldToInvPacketBody {
+    pub packet_id: u8,
+    pub amount: u8,
+}
+
+
+/// 0x2c
+/// Response from C->S PlaySound packet.
+#[repr(C, packed(1))]
+#[derive(Copy, Clone, Debug, PartialEq)]
+pub struct PlaySoundPacketBody {
+    pub packet_id: u8,
+    pub unit_type: u8,
+    pub unit_id: u32,
+    pub sound: u16,
 }
 
 /// 0x8f
 /// Response from C->S Ping packet.
-#[repr(C)]
-#[derive(Debug, PartialEq)]
+#[repr(C, packed(1))]
+#[derive(Copy, Clone, Debug, PartialEq)]
 pub struct PongPacketBody {
+    pub packet_id: u8,
     /// Always 0x00 * 32
-    bytes: [u8; 32],
+    pub bytes: [u8; 32],
 }
 
 /// 0xaf
-#[repr(C)]
-#[derive(Debug, PartialEq)]
+#[repr(C, packed(1))]
+#[derive(Copy, Clone, Debug, PartialEq)]
 pub struct ConnectionInfoPacketBody {
+    pub packet_id: u8,
     /// Whether compression is enabled or not.
-    compression: bool
+    pub compression: bool,
 }
 
 #[repr(u8)]
-#[derive(Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq)]
 pub enum PacketFromServer {
     /// 0x00
     GameLoading,
@@ -66,7 +92,7 @@ pub enum PacketFromServer {
     /// 0x15
     ReassignPlayer,
     /// 0x19
-    GoldToInv,
+    GoldToInv(GoldToInvPacketBody),
     /// 0x1a
     AddExpByte,
     /// 0x1b
@@ -96,7 +122,7 @@ pub enum PacketFromServer {
     /// 0x2a
     NpcTransaction,
     /// 0x2c
-    PlaySound,
+    PlaySound(PlaySoundPacketBody),
     /// 0x37
     Unknown0x37,
     /// 0x3e
@@ -196,13 +222,17 @@ pub enum PacketFromServer {
 }
 
 impl PacketFromServer {
-    pub fn convert(packet: *const u8, _size: i32) -> Result<Self, ()> {
+    pub fn convert(packet: *const u8, size: i32) -> Result<Self, ()> {
         let packet_id = unsafe { *packet.offset(0) };
-        let packet = unsafe { packet.offset(1) };
 
         match packet_id {
             0x00 => Ok(PacketFromServer::GameLoading),
-            0x01 => Ok(PacketFromServer::GameFlags(unsafe { (packet as *const GameFlagsPacketBody).read() })),
+            0x01 => Ok(PacketFromServer::GameFlags(
+                unsafe {
+                    debug_assert_eq!(std::mem::size_of::<GameFlagsPacketBody>(), size as usize);
+                    (packet as *const GameFlagsPacketBody).read()
+                }
+            )),
             0x02 => Ok(PacketFromServer::LoadSuccessful),
             0x03 => Ok(PacketFromServer::LoadAct),
             0x04 => Ok(PacketFromServer::LoadComplete),
@@ -218,7 +248,7 @@ impl PacketFromServer {
             0x0e => Ok(PacketFromServer::ObjectState),
             0x0f => Ok(PacketFromServer::PlayerMove),
             0x15 => Ok(PacketFromServer::ReassignPlayer),
-            0x19 => Ok(PacketFromServer::GoldToInv),
+            0x19 => Ok(PacketFromServer::GoldToInv(unsafe { (packet as *const GoldToInvPacketBody).read() })),
             0x1a => Ok(PacketFromServer::AddExpByte),
             0x1b => Ok(PacketFromServer::AddExpWord),
             0x1c => Ok(PacketFromServer::AddExpDword),
@@ -233,7 +263,7 @@ impl PacketFromServer {
             0x28 => Ok(PacketFromServer::QuestInfo),
             0x29 => Ok(PacketFromServer::GameQuestInfo),
             0x2a => Ok(PacketFromServer::NpcTransaction),
-            0x2c => Ok(PacketFromServer::PlaySound),
+            0x2c => Ok(PacketFromServer::PlaySound(unsafe { (packet as *const PlaySoundPacketBody).read() })),
             0x37 => Ok(PacketFromServer::Unknown0x37),
             0x3e => Ok(PacketFromServer::UpdateItemStats),
             0x3f => Ok(PacketFromServer::UseStackableItem),

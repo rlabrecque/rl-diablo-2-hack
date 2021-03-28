@@ -209,8 +209,17 @@ extern "fastcall" fn game_packet_received_hook(packet: *const u8, size: i32) {
         );
 
         match packet_enum {
-            PacketFromServer::ConnectionInfo(test) => {
-                println!("ConnectionInfo: {:?}", test);
+            PacketFromServer::ConnectionInfo(packet) => {
+                println!("ConnectionInfo: {:?}", packet);
+            }
+            PacketFromServer::GameFlags(packet) => {
+                println!("GameFlags: {:?}", packet);
+            }
+            PacketFromServer::GoldToInv(packet) => {
+                println!("GoldToInv: {:?}", packet);
+            }
+            PacketFromServer::PlaySound(packet) => {
+                println!("PlaySound: {:?}", packet);
             }
             PacketFromServer::WeaponSwitch => {
                 println!("WeaponSwitch");
