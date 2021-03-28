@@ -200,13 +200,13 @@ pub fn create_hook_game_packet_received(game: &D2Library) -> GenericDetour<GameP
 extern "fastcall" fn game_packet_received_hook(packet: *const u8, size: i32) {
     if size != -1 {
         let packet_type = unsafe { *packet.offset(0) };
-        println!("game_packet_received_hook: Packet: 0x{:x}", packet_type);
+        //println!("game_packet_received_hook: Packet: 0x{:x}", packet_type);
 
         let packet_enum: PacketFromServer = PacketFromServer::convert(packet, size).unwrap();
-        println!(
+        /*println!(
             "game_packet_received_hook: Packet: 0x{:x} {:?} Size: {}",
             packet_type, packet_enum, size
-        );
+        );*/
 
         match packet_enum {
             PacketFromServer::ConnectionInfo(packet) => {
