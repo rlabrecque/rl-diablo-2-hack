@@ -198,15 +198,17 @@ pub fn create_hook_game_packet_received(game: &D2Library) -> GenericDetour<GameP
 }
 
 extern "fastcall" fn game_packet_received_hook(packet: *const u8, size: i32) {
+    let d2core: &D2Core = D2Core::get();
+
     if size != -1 {
-        let packet_type = unsafe { *packet.offset(0) };
+        //let packet_type = unsafe { *packet.offset(0) };
         //println!("game_packet_received_hook: Packet: 0x{:x}", packet_type);
 
         let packet_enum: PacketFromServer = PacketFromServer::convert(packet, size).unwrap();
         /*println!(
             "game_packet_received_hook: Packet: 0x{:x} {:?} Size: {}",
             packet_type, packet_enum, size
-        );*/
+        );
 
         match packet_enum {
             PacketFromServer::ConnectionInfo(packet) => {
@@ -225,10 +227,17 @@ extern "fastcall" fn game_packet_received_hook(packet: *const u8, size: i32) {
                 println!("WeaponSwitch");
             }
             _ => {}
+        }*/
+
+        match d2core.game_packet_received_listener.as_ref() {
+            Some(func) => {
+                (func)(&packet_enum);
+            }
+            None => {}
         }
     }
 
-    D2Core::get().game_packet_received_detour.call(packet, size);
+    d2core.game_packet_received_detour.call(packet, size);
 }
 
 pub fn game_packet_received(d2core: &D2Core, packet: *const u8, size: i32) {

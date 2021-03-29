@@ -1,16 +1,19 @@
-use super::d2library::D2Library;
 use super::functions;
+use super::{d2library::D2Library, packets::PacketFromServer};
 use detour::GenericDetour;
 
-pub struct D2Core {
+pub type OnGamePacketReceivedFn = fn(packet: &PacketFromServer);
+
+pub struct D2Core<'a> {
     pub game: D2Library,
 
     pub exit_game_detour: GenericDetour<functions::ExitGameFn>,
     pub print_game_string_detour: GenericDetour<functions::PrintGameStringFn>,
     pub game_packet_received_detour: GenericDetour<functions::GamePacketReceivedFn>,
+    pub game_packet_received_listener: Option<Box<dyn 'a + Fn(&PacketFromServer)>>,
 }
 
-impl D2Core {
+impl<'a> D2Core<'a> {
     /// Constructs a new copy of D2Core.
     /// Note: This also initializes the singleton used for accessing D2Core
     /// from detoured functions. The singleton can be accessed via get().
@@ -28,6 +31,7 @@ impl D2Core {
             exit_game_detour: exit_game_detour,
             print_game_string_detour: print_game_string_detour,
             game_packet_received_detour: game_packet_received_detour,
+            game_packet_received_listener: None,
         });
 
         unsafe {
@@ -46,9 +50,13 @@ impl D2Core {
             &(*INSTANCE)
         }
     }
+
+    pub fn set_callback(&mut self, c: Box<dyn 'a + Fn(&PacketFromServer)>) {
+        self.game_packet_received_listener = Some(c);
+    }
 }
 
-impl Drop for D2Core {
+impl<'a> Drop for D2Core<'a> {
     fn drop(&mut self) {
         println!("D2Core - Drop");
 
@@ -61,6 +69,8 @@ impl Drop for D2Core {
             self.print_game_string_detour.disable().unwrap();
             self.game_packet_received_detour.disable().unwrap();
         }
+
+        self.game_packet_received_listener = None;
     }
 }
 
