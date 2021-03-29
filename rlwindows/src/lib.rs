@@ -166,7 +166,7 @@ pub fn get_token_information(
             token_information_length,
             return_length,
         );
-        return ret == winapi::shared::minwindef::TRUE;
+        ret == winapi::shared::minwindef::TRUE
     }
 }
 
@@ -182,7 +182,7 @@ pub fn close_handle(handle: winapi::um::winnt::HANDLE) -> bool {
 
     unsafe {
         let ret = winapi::um::handleapi::CloseHandle(handle);
-        return ret == winapi::shared::minwindef::TRUE;
+        ret == winapi::shared::minwindef::TRUE
     }
 }
 
@@ -197,7 +197,7 @@ pub fn open_process_token(
 ) -> bool {
     unsafe {
         let ret = winapi::um::processthreadsapi::OpenProcessToken(process_handle, desired_access, token_handle);
-        return ret == winapi::shared::minwindef::TRUE;
+        ret == winapi::shared::minwindef::TRUE
     }
 }
 
@@ -208,7 +208,7 @@ pub fn lookup_privilege_value(
 ) -> bool {
     unsafe {
         let ret = winapi::um::winbase::LookupPrivilegeValueW(system_name, name, luid);
-        return ret == winapi::shared::minwindef::TRUE;
+        ret == winapi::shared::minwindef::TRUE
     }
 }
 
@@ -229,7 +229,7 @@ pub fn adjust_token_privileges(
             previous_state,
             return_length,
         );
-        return ret == winapi::shared::minwindef::TRUE;
+        ret == winapi::shared::minwindef::TRUE
     }
 }
 
