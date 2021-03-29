@@ -23,7 +23,6 @@ pub struct GoldToInvPacketBody {
     pub amount: u8,
 }
 
-
 /// 0x2c
 /// Response from C->S PlaySound packet.
 #[repr(C, packed(1))]
@@ -227,12 +226,10 @@ impl PacketFromServer {
 
         match packet_id {
             0x00 => Ok(PacketFromServer::GameLoading),
-            0x01 => Ok(PacketFromServer::GameFlags(
-                unsafe {
-                    debug_assert_eq!(std::mem::size_of::<GameFlagsPacketBody>(), size as usize);
-                    (packet as *const GameFlagsPacketBody).read()
-                }
-            )),
+            0x01 => Ok(PacketFromServer::GameFlags(unsafe {
+                debug_assert_eq!(std::mem::size_of::<GameFlagsPacketBody>(), size as usize);
+                (packet as *const GameFlagsPacketBody).read()
+            })),
             0x02 => Ok(PacketFromServer::LoadSuccessful),
             0x03 => Ok(PacketFromServer::LoadAct),
             0x04 => Ok(PacketFromServer::LoadComplete),
@@ -248,12 +245,10 @@ impl PacketFromServer {
             0x0e => Ok(PacketFromServer::ObjectState),
             0x0f => Ok(PacketFromServer::PlayerMove),
             0x15 => Ok(PacketFromServer::ReassignPlayer),
-            0x19 => Ok(PacketFromServer::GoldToInv(
-                unsafe {
-                    debug_assert_eq!(std::mem::size_of::<GoldToInvPacketBody>(), size as usize);
-                    (packet as *const GoldToInvPacketBody).read()
-                }
-            )),
+            0x19 => Ok(PacketFromServer::GoldToInv(unsafe {
+                debug_assert_eq!(std::mem::size_of::<GoldToInvPacketBody>(), size as usize);
+                (packet as *const GoldToInvPacketBody).read()
+            })),
             0x1a => Ok(PacketFromServer::AddExpByte),
             0x1b => Ok(PacketFromServer::AddExpWord),
             0x1c => Ok(PacketFromServer::AddExpDword),
@@ -268,12 +263,10 @@ impl PacketFromServer {
             0x28 => Ok(PacketFromServer::QuestInfo),
             0x29 => Ok(PacketFromServer::GameQuestInfo),
             0x2a => Ok(PacketFromServer::NpcTransaction),
-            0x2c => Ok(PacketFromServer::PlaySound(
-                unsafe {
-                    debug_assert_eq!(std::mem::size_of::<PlaySoundPacketBody>(), size as usize);
-                    (packet as *const PlaySoundPacketBody).read()
-                }
-            )),
+            0x2c => Ok(PacketFromServer::PlaySound(unsafe {
+                debug_assert_eq!(std::mem::size_of::<PlaySoundPacketBody>(), size as usize);
+                (packet as *const PlaySoundPacketBody).read()
+            })),
             0x37 => Ok(PacketFromServer::Unknown0x37),
             0x3e => Ok(PacketFromServer::UpdateItemStats),
             0x3f => Ok(PacketFromServer::UseStackableItem),
@@ -288,7 +281,7 @@ impl PacketFromServer {
             0x53 => Ok(PacketFromServer::Darkness),
             0x59 => Ok(PacketFromServer::AssignPlayer),
             0x5a => Ok(PacketFromServer::EventMessages),
-            0x5b => Ok(PacketFromServer::PlayerInGame,),
+            0x5b => Ok(PacketFromServer::PlayerInGame),
             0x5d => Ok(PacketFromServer::QuestItemState),
             0x5e => Ok(PacketFromServer::GameQuestAvailability),
             0x5f => Ok(PacketFromServer::Unknown0x5f),
@@ -306,12 +299,10 @@ impl PacketFromServer {
             0x7e => Ok(PacketFromServer::ReloadCMNCOF),
             0x8a => Ok(PacketFromServer::NpcWantsToInteract),
             0x8d => Ok(PacketFromServer::AssignPlayerToParty),
-            0x8f => Ok(PacketFromServer::Pong(
-                unsafe {
-                    debug_assert_eq!(std::mem::size_of::<PongPacketBody>(), size as usize);
-                    (packet as *const PongPacketBody).read()
-                }
-            )),
+            0x8f => Ok(PacketFromServer::Pong(unsafe {
+                debug_assert_eq!(std::mem::size_of::<PongPacketBody>(), size as usize);
+                (packet as *const PongPacketBody).read()
+            })),
             0x91 => Ok(PacketFromServer::SetNpcGossipAct),
             0x94 => Ok(PacketFromServer::BaseSkillLevels),
             0x95 => Ok(PacketFromServer::LifeAndManaUpdate),
@@ -325,12 +316,10 @@ impl PacketFromServer {
             0xaa => Ok(PacketFromServer::AddUnit),
             0xab => Ok(PacketFromServer::NpcHeal),
             0xac => Ok(PacketFromServer::AssignNPC),
-            0xaf => Ok(PacketFromServer::ConnectionInfo(
-                unsafe {
-                    debug_assert_eq!(std::mem::size_of::<ConnectionInfoPacketBody>(), size as usize);
-                    (packet as *const ConnectionInfoPacketBody).read()
-                }
-            )),
+            0xaf => Ok(PacketFromServer::ConnectionInfo(unsafe {
+                debug_assert_eq!(std::mem::size_of::<ConnectionInfoPacketBody>(), size as usize);
+                (packet as *const ConnectionInfoPacketBody).read()
+            })),
             0xb0 => Ok(PacketFromServer::GameConnectionTerminated),
             _ => Err(()),
         }
