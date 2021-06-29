@@ -1,6 +1,6 @@
 use crate::{
     d2::packets::PacketFromServer,
-    plugincore::plugin_info::{Plugin, PluginInfo},
+    plugincore::{plugin::Plugin, plugin_info::PluginInfo},
 };
 
 pub fn get_info() -> PluginInfo {

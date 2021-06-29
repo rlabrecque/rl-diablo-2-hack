@@ -1,4 +1,4 @@
-use crate::plugincore::plugin_info::{Plugin, PluginInfo};
+use crate::plugincore::{plugin::Plugin, plugin_info::PluginInfo};
 
 pub fn get_info() -> PluginInfo {
     PluginInfo {
