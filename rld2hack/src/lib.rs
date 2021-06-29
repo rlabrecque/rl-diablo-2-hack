@@ -26,8 +26,8 @@ impl RLD2Hack {
     }
 
     fn on_game_packet_received(&self, packet: &PacketFromServer) {
-        for plugin in &self.plugins {
-            plugin.plugin.on_game_packet_received(packet);
+        for plugin_info in &self.plugins {
+            plugin_info.plugin.on_game_packet_received(packet);
         }
     }
 }
@@ -42,19 +42,19 @@ fn dll_attach() {
         rld2hack.on_game_packet_received(packet);
     }));
 
-    for plugin in &rld2hack.plugins {
+    for plugin_info in &rld2hack.plugins {
         println!(
             "Loading Plugin: {} ({}) by {}",
-            plugin.name, plugin.version, plugin.author
+            plugin_info.name, plugin_info.version, plugin_info.author
         );
-        plugin.plugin.on_load();
+        plugin_info.plugin.on_load();
     }
 
     while THREAD_RUNNING.load(std::sync::atomic::Ordering::Relaxed) {
         println!("Running!");
 
-        for plugin in &rld2hack.plugins {
-            plugin.plugin.on_tick();
+        for plugin_info in &rld2hack.plugins {
+            plugin_info.plugin.on_tick();
         }
 
         std::thread::sleep(std::time::Duration::from_millis(500));
