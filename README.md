@@ -20,6 +20,8 @@ Currently supports Diablo 2 LOD patch 1.14d.
 Run the following from the project root:
 
 ```batch
+rustup target add i686-pc-windows-msvc --toolchain nightly
+
 cargo build
 ```
 
