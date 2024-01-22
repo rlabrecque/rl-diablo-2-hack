@@ -37,7 +37,6 @@ pub fn is_dll_loaded_in_pid(
 
 /// Injects the specified dll into all the processes with a given name.
 /// Returns the process id's of the injected processes.
-#[cfg(target_arch = "x86")]
 pub fn inject_dll_into_process_name(
     dll_path: &std::path::PathBuf,
     process_name: &str,
@@ -60,7 +59,6 @@ pub fn inject_dll_into_process_name(
 
 /// Injects the specified dll into all the processes with a given name.
 /// Returns the process id's of the injected processes.
-#[cfg(target_arch = "x86")]
 fn inject_dll_into_process_ids(
     dll_path: &std::path::PathBuf,
     process_ids: Vec<u32>,
