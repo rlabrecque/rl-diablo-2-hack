@@ -2,7 +2,7 @@ use super::d2core::D2Core;
 use super::d2library::D2Library;
 use super::packets::PacketFromServer;
 
-use detour::GenericDetour;
+use retour::GenericDetour;
 
 /*
 FUNCPTR(D2CLIENT, GetQuestInfo, void* __stdcall, (void), 0xB32D0) // Updated 1.14d //004B32D0-BASE

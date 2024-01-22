@@ -1,6 +1,6 @@
 use super::functions;
 use super::{d2library::D2Library, packets::PacketFromServer};
-use detour::GenericDetour;
+use retour::GenericDetour;
 
 pub type OnGamePacketReceivedFn = fn(packet: &PacketFromServer);
 
